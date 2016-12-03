@@ -5,9 +5,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -28,17 +30,11 @@ import com.jcraft.jsch.Session;
  * java library
  *
  */
-// /release_20161115
 public class ShellExecuter implements Closeable {
-
-	// private static final Logger LOGGER = Logger.getLogger(ShellExecuter.class
-	// .getName());
-
 	final static Logger logger = Logger.getLogger(ShellExecuter.class);
 
 	private static final String CODE_DIR_PATH = "/home/ubuntu/code/";
 	private static final String CONFIG_FILE_NAME = "config.js";
-	private static final String LOG_FILE_NAME = "log.log";
 
 	private static final String BUILD_AND_DEPLOY = CODE_DIR_PATH
 			+ "nabs/NABS/build_and_deploy.sh";
@@ -51,15 +47,28 @@ public class ShellExecuter implements Closeable {
 	private static final String ECONOMIC_MEANING = "economic-meaning";
 
 	private static final Map<String, String> projectOriginMap = new HashMap<>();
+	private static String USERNAME = "ubuntu"; // username for remote host
+	// private static String PASSWORD ="password"; // password of the remote
+	// host
+	private static String host = "35.156.8.144"; // remote host address
+	private static int port = 22;
+	String privateKey = "/home/sergeyhlghatyan/ssh_keys/NABS.pem";
 
 	private ConfigModel configModel = null;
 	private Session session = null;
+
+	public Session getSession() {
+		return session;
+	}
 
 	public static void main(String[] args) {
 
 		try (final ShellExecuter shellExecuter = new ShellExecuter()) {
 
-			shellExecuter.pullandCheckoutProjectsToBranches();
+			// shellExecuter.pullandCheckoutProjectsToBranches();
+
+			String command = " cd /home/ubuntu/temp; ./script.sh";
+			shellExecuter.executeCommand(shellExecuter.getSession(), command);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -91,8 +100,6 @@ public class ShellExecuter implements Closeable {
 		this.executeCommands(this.session, commands);
 	}
 
-	// https://<username>:<password>@github.com/<github_account>/<repository_name>.git"
-	// <branch_name>
 	private void initGitUrlsWithCredentials() {
 		projectOriginMap.put(NABS, String.format(
 				"https://%s:%s@github.com/SCDM/nabs.git",
@@ -153,13 +160,6 @@ public class ShellExecuter implements Closeable {
 		return config;
 	}
 
-	private static String USERNAME = "ubuntu"; // username for remote host
-	// private static String PASSWORD ="password"; // password of the remote
-	// host
-	private static String host = "35.156.8.144"; // remote host address
-	private static int port = 22;
-	String privateKey = "/home/sergeyhlghatyan/ssh_keys/NABS.pem";
-
 	private Session openConnection() {
 		Session session = null;
 		try {
@@ -219,6 +219,7 @@ public class ShellExecuter implements Closeable {
 
 			// create the excution channel over the session
 			ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+			channelExec.setInputStream(null);
 
 			// Gets an InputStream for this channel. All data arriving in as
 			// messages from the remote side can be read from this stream.
@@ -228,11 +229,20 @@ public class ShellExecuter implements Closeable {
 			// In our case its the remote shell script
 			// channelExec.setCommand("sh " + commands[]);
 
+			((ChannelExec) channelExec).setPty(true);
+			// channelExec.setPtyType("VT100");
 			channelExec.setCommand(command);
+
 			logger.debug(command);
+
+			// OutputStream out = channelExec.getOutputStream();
+			((ChannelExec) channelExec).setErrStream(System.err);
 
 			// Execute the command
 			channelExec.connect();
+
+			// out.write(("" + "\n").getBytes());
+			// out.flush();
 
 			// Read the output from the input stream we set above
 			BufferedReader reader = new BufferedReader(
@@ -246,8 +256,6 @@ public class ShellExecuter implements Closeable {
 				result.add(line);
 				logger.debug(line);
 			}
-
-			// result.forEach(item -> System.out.println(item));
 
 			// retrieve the exit status of the remote command corresponding
 			// to

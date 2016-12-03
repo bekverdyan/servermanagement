@@ -1,4 +1,4 @@
-package servermanagement.ui;
+package main.java.servermanagement.ui;
 
 import javax.swing.JPanel;
 

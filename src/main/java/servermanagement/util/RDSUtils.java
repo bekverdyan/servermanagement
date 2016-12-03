@@ -1,4 +1,4 @@
-package servermanagement.util;
+package main.java.servermanagement.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

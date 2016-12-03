@@ -1,4 +1,4 @@
-package servermanagement.ui;
+package main.java.servermanagement.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

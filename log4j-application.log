@@ -1,0 +1,264 @@
+2016-12-03 15:53:08 INFO  ShellExecuter:174 - identity added 
+2016-12-03 15:53:09 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:53:09 DEBUG ShellExecuter:248 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:53:09 DEBUG ShellExecuter:248 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:53:09 DEBUG ShellExecuter:248 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:53:09 DEBUG ShellExecuter:248 - M	NABS/build_and_deploy.sh
+2016-12-03 15:53:09 DEBUG ShellExecuter:248 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:53:09 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:09 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/nabs.git master )
+2016-12-03 15:53:10 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:10 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:53:10 DEBUG ShellExecuter:263 - Done, but exit status not set!
+2016-12-03 15:53:10 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/foundation.git 11.0 )
+2016-12-03 15:53:11 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:11 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:53:11 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:11 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finval.git 2.3.19 )
+2016-12-03 15:53:12 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:12 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:53:12 DEBUG ShellExecuter:248 - Your branch is behind 'origin/nabs_integration' by 14 commits, and can be fast-forwarded.
+2016-12-03 15:53:12 DEBUG ShellExecuter:248 -   (use "git pull" to update your local branch)
+2016-12-03 15:53:12 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:12 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/economic-meaning && git pull null nabs_integration )
+2016-12-03 15:53:13 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:13 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:53:13 DEBUG ShellExecuter:248 - M	calibration/deployongrid.sh
+2016-12-03 15:53:13 DEBUG ShellExecuter:248 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:53:13 DEBUG ShellExecuter:248 - Your branch is behind 'origin/finmath_integration' by 12 commits, and can be fast-forwarded.
+2016-12-03 15:53:13 DEBUG ShellExecuter:248 -   (use "git pull" to update your local branch)
+2016-12-03 15:53:13 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:13 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/grid.git finmath_integration )
+2016-12-03 15:53:14 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:14 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:53:14 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:14 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:53:15 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:15 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:53:15 DEBUG ShellExecuter:248 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:53:15 DEBUG ShellExecuter:248 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:53:15 DEBUG ShellExecuter:248 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:53:15 DEBUG ShellExecuter:248 - M	NABS/build_and_deploy.sh
+2016-12-03 15:53:15 DEBUG ShellExecuter:248 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:53:15 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:15 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/nabs.git master )
+2016-12-03 15:53:16 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:16 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:53:16 DEBUG ShellExecuter:263 - Done, but exit status not set!
+2016-12-03 15:53:16 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/foundation.git 11.0 )
+2016-12-03 15:53:17 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:17 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:53:17 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:17 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finval.git 2.3.19 )
+2016-12-03 15:53:18 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:18 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:53:18 DEBUG ShellExecuter:248 - Your branch is behind 'origin/nabs_integration' by 14 commits, and can be fast-forwarded.
+2016-12-03 15:53:18 DEBUG ShellExecuter:248 -   (use "git pull" to update your local branch)
+2016-12-03 15:53:18 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:18 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/economic-meaning && git pull null nabs_integration )
+2016-12-03 15:53:19 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:19 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:53:19 DEBUG ShellExecuter:248 - M	calibration/deployongrid.sh
+2016-12-03 15:53:19 DEBUG ShellExecuter:248 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:53:19 DEBUG ShellExecuter:248 - Your branch is behind 'origin/finmath_integration' by 12 commits, and can be fast-forwarded.
+2016-12-03 15:53:19 DEBUG ShellExecuter:248 -   (use "git pull" to update your local branch)
+2016-12-03 15:53:19 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:19 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/grid.git finmath_integration )
+2016-12-03 15:53:20 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:53:20 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:53:20 DEBUG ShellExecuter:267 - Done!
+2016-12-03 15:53:20 DEBUG ShellExecuter:233 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:53:21 DEBUG ShellExecuter:265 - Done, but with error!
+2016-12-03 15:54:09 INFO  ShellExecuter:177 - identity added 
+2016-12-03 15:54:14 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:54:15 DEBUG ShellExecuter:268 - Done, but with error!
+2016-12-03 15:54:15 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:54:16 DEBUG ShellExecuter:268 - Done, but with error!
+2016-12-03 15:56:43 INFO  ShellExecuter:177 - identity added 
+2016-12-03 15:56:44 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:56:45 DEBUG ShellExecuter:268 - Done, but with error!
+2016-12-03 15:56:45 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:56:46 DEBUG ShellExecuter:268 - Done, but with error!
+2016-12-03 15:57:04 INFO  ShellExecuter:177 - identity added 
+2016-12-03 15:57:05 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:06 DEBUG ShellExecuter:251 - Already up-to-date.
+2016-12-03 15:57:06 DEBUG ShellExecuter:270 - Done!
+2016-12-03 15:57:06 DEBUG ShellExecuter:236 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:07 DEBUG ShellExecuter:251 - Already up-to-date.
+2016-12-03 15:57:07 DEBUG ShellExecuter:270 - Done!
+2016-12-03 15:57:20 INFO  ShellExecuter:173 - identity added 
+2016-12-03 15:57:21 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:57:22 DEBUG ShellExecuter:247 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:57:22 DEBUG ShellExecuter:247 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:57:22 DEBUG ShellExecuter:247 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:57:22 DEBUG ShellExecuter:247 - M	NABS/build_and_deploy.sh
+2016-12-03 15:57:22 DEBUG ShellExecuter:247 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:57:22 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:22 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/nabs.git master )
+2016-12-03 15:57:24 DEBUG ShellExecuter:247 - Updating ea85006..dc6b654
+2016-12-03 15:57:24 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:57:24 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:57:24 DEBUG ShellExecuter:262 - Done, but exit status not set!
+2016-12-03 15:57:24 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/foundation.git 11.0 )
+2016-12-03 15:57:25 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:25 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:25 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:57:25 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:25 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finval.git 2.3.19 )
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:26 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:26 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 - Your branch is behind 'origin/nabs_integration' by 14 commits, and can be fast-forwarded.
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 -   (use "git pull" to update your local branch)
+2016-12-03 15:57:26 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:26 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git pull null nabs_integration )
+2016-12-03 15:57:26 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:57:26 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 - M	calibration/deployongrid.sh
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 - Your branch is behind 'origin/finmath_integration' by 12 commits, and can be fast-forwarded.
+2016-12-03 15:57:26 DEBUG ShellExecuter:247 -   (use "git pull" to update your local branch)
+2016-12-03 15:57:26 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:26 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/grid.git finmath_integration )
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 - Updating d6c4bcd..198b4d2
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 - Fast-forward
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 -  calibration/createzip.sh                           | 23 +++++++++++++++-------
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 -  calibration/pom.xml                                |  2 +-
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 -  .../calibration/service/CalibrationService.java    |  8 +++++++-
+2016-12-03 15:57:28 DEBUG ShellExecuter:247 -  3 files changed, 24 insertions(+), 9 deletions(-)
+2016-12-03 15:57:28 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:28 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:28 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:28 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:29 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:29 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - M	NABS/build_and_deploy.sh
+2016-12-03 15:57:29 DEBUG ShellExecuter:247 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:57:29 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:29 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/nabs.git master )
+2016-12-03 15:57:30 DEBUG ShellExecuter:247 - Updating ea85006..dc6b654
+2016-12-03 15:57:30 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:57:30 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:57:31 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:31 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/foundation.git 11.0 )
+2016-12-03 15:57:31 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:31 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:31 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:57:32 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:32 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finval.git 2.3.19 )
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:33 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:33 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 - Your branch is behind 'origin/nabs_integration' by 14 commits, and can be fast-forwarded.
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 -   (use "git pull" to update your local branch)
+2016-12-03 15:57:33 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:33 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git pull null nabs_integration )
+2016-12-03 15:57:33 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:57:33 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 - M	calibration/deployongrid.sh
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 - Your branch is ahead of 'origin/finmath_integration' by 2 commits.
+2016-12-03 15:57:33 DEBUG ShellExecuter:247 -   (use "git push" to publish your local commits)
+2016-12-03 15:57:33 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:33 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/grid.git finmath_integration )
+2016-12-03 15:57:34 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:34 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:34 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:34 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:57:34 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:57:35 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:57:35 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:26 INFO  ShellExecuter:173 - identity added 
+2016-12-03 15:58:27 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:58:27 DEBUG ShellExecuter:247 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:58:27 DEBUG ShellExecuter:247 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:58:27 DEBUG ShellExecuter:247 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:58:27 DEBUG ShellExecuter:247 - M	NABS/build_and_deploy.sh
+2016-12-03 15:58:27 DEBUG ShellExecuter:247 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:58:27 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:27 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/nabs.git master )
+2016-12-03 15:58:29 DEBUG ShellExecuter:247 - Updating ea85006..dc6b654
+2016-12-03 15:58:29 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:58:29 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:58:29 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:29 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/foundation.git 11.0 )
+2016-12-03 15:58:30 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:30 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:30 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:58:30 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:30 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finval.git 2.3.19 )
+2016-12-03 15:58:31 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:31 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:31 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:58:31 DEBUG ShellExecuter:247 - Your branch is behind 'origin/nabs_integration' by 14 commits, and can be fast-forwarded.
+2016-12-03 15:58:31 DEBUG ShellExecuter:247 -   (use "git pull" to update your local branch)
+2016-12-03 15:58:31 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:31 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/economic-meaning.git nabs_integration )
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 - Updating 1738deb..35c08c6
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 - Fast-forward
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  best-anchored-curve-checker/pom.xml  |  4 ++--
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  calibration/pom.xml                  |  4 ++--
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  economic-consistency-checker/pom.xml |  2 +-
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  install-economic-meaning.sh          | 42 ++++++++++++++++++++++++++++++++++++
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  4 files changed, 47 insertions(+), 5 deletions(-)
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -  create mode 100755 install-economic-meaning.sh
+2016-12-03 15:58:32 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:32 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 - M	calibration/deployongrid.sh
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 - Your branch is ahead of 'origin/finmath_integration' by 2 commits.
+2016-12-03 15:58:32 DEBUG ShellExecuter:247 -   (use "git push" to publish your local commits)
+2016-12-03 15:58:32 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:32 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/grid.git finmath_integration )
+2016-12-03 15:58:33 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:33 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:33 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:58:34 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:34 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:58:34 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:34 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:34 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git checkout master )
+2016-12-03 15:58:35 DEBUG ShellExecuter:247 - M	NABS/NABS-java/src/main/resources/settings.properties
+2016-12-03 15:58:35 DEBUG ShellExecuter:247 - M	NABS/NABS-mainservice/src/main/resources/settings.properties
+2016-12-03 15:58:35 DEBUG ShellExecuter:247 - M	NABS/NABS-nabsservice/src/main/resources/settings.properties
+2016-12-03 15:58:35 DEBUG ShellExecuter:247 - M	NABS/build_and_deploy.sh
+2016-12-03 15:58:35 DEBUG ShellExecuter:247 - Your branch is up-to-date with 'origin/master'.
+2016-12-03 15:58:35 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:35 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/nabs && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/nabs.git master )
+2016-12-03 15:58:36 DEBUG ShellExecuter:247 - Updating ea85006..dc6b654
+2016-12-03 15:58:36 DEBUG ShellExecuter:264 - Done, but with error!
+2016-12-03 15:58:36 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git checkout 11.0 )
+2016-12-03 15:58:36 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:36 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/foundation && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/foundation.git 11.0 )
+2016-12-03 15:58:37 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:37 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:37 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git checkout 2.3.19 )
+2016-12-03 15:58:37 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:37 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finval && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finval.git 2.3.19 )
+2016-12-03 15:58:38 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:38 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:38 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git checkout nabs_integration )
+2016-12-03 15:58:38 DEBUG ShellExecuter:247 - Your branch is ahead of 'origin/nabs_integration' by 2 commits.
+2016-12-03 15:58:38 DEBUG ShellExecuter:247 -   (use "git push" to publish your local commits)
+2016-12-03 15:58:38 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:38 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/economic-meaning && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/economic-meaning.git nabs_integration )
+2016-12-03 15:58:39 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:39 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:39 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git checkout finmath_integration )
+2016-12-03 15:58:39 DEBUG ShellExecuter:247 - M	calibration/deployongrid.sh
+2016-12-03 15:58:39 DEBUG ShellExecuter:247 - M	calibration/src/main/resources/calibrationservice.properties
+2016-12-03 15:58:39 DEBUG ShellExecuter:247 - Your branch is ahead of 'origin/finmath_integration' by 2 commits.
+2016-12-03 15:58:39 DEBUG ShellExecuter:247 -   (use "git push" to publish your local commits)
+2016-12-03 15:58:39 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:39 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/grid && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/grid.git finmath_integration )
+2016-12-03 15:58:40 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:40 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:40 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git checkout finmath-finval-adapter-0.4.8 )
+2016-12-03 15:58:40 DEBUG ShellExecuter:266 - Done!
+2016-12-03 15:58:40 DEBUG ShellExecuter:232 - (cd /home/ubuntu/code/finmath-adapter && git pull https://sergeyhlghatyan-scdm:RErPq2k4@github.com/SCDM/finmath-adapter.git finmath-finval-adapter-0.4.8 )
+2016-12-03 15:58:41 DEBUG ShellExecuter:247 - Already up-to-date.
+2016-12-03 15:58:41 DEBUG ShellExecuter:266 - Done!

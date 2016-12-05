@@ -4,7 +4,7 @@
 	"ec2": [{
 		"id": "i-d31f266f",
 		"name": "NABS-QA-31",
-		"rds": "ceph-1484",
+		"rds": "NABS-QA-31",
 		"branches": {
 			"nabs": "master",
 			"foundation": "11.0",
@@ -14,5 +14,5 @@
 			"finmath-adapter": "finmath-finval-adapter-0.4.9"
 		}
 	}],
-	"snapshot": "deploy-test"
+	"snapshot": "sink-20160613"
 }

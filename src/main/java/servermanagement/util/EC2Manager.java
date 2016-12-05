@@ -25,18 +25,6 @@ public class EC2Manager {
 
 	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
 
-	// public EC2Manager(ConfigModel configModel, Consumer<EC2> ec2Callback) {
-	//
-	// _configModel = configModel;
-	// _ec2Callback = ec2Callback;
-	// }
-	//
-	// public EC2Manager(ConfigModel configModel) {
-	//
-	// _configModel = configModel;
-	// _ec2Callback = null;
-	// }
-
 	public EC2Manager() {
 	}
 
@@ -44,7 +32,6 @@ public class EC2Manager {
 		AmazonEC2AsyncClient client = getClient();
 		String ip = startServer(client, ec2);
 		client.shutdown();
-
 		return ip;
 	}
 
@@ -63,7 +50,6 @@ public class EC2Manager {
 	}
 
 	private String startServer(AmazonEC2Async client, EC2 ec2) {
-
 		String ip = null;
 		try {
 

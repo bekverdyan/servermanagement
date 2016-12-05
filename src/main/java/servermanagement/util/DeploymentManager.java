@@ -29,7 +29,8 @@ public class DeploymentManager {
 
 		boolean buildAndDeploy = false;
 
-		start(configModel, ecToProcess, buildAndDeploy);
+		//start(configModel, ecToProcess, buildAndDeploy);
+		stop(configModel,ecToProcess);
 	}
 
 	public static void start(ConfigModel configModel, List<EC2> ecToProcess,
@@ -69,8 +70,7 @@ public class DeploymentManager {
 				});
 	}
 
-	public static void stop(ConfigModel configModel, List<EC2> ecToProcess,
-			boolean buildAndDeploy) {
+	public static void stop(ConfigModel configModel, List<EC2> ecToProcess) {
 
 		EC2Manager ec2Manager = new EC2Manager();
 
@@ -81,7 +81,6 @@ public class DeploymentManager {
 		ecToProcess.forEach(ec2 -> {
 			service.newThread(() -> {
 				try {
-
 					rdsManager.stopRDSInstance(ec2);
 					ec2Manager.stopEc2Instance(ec2);
 				} catch (Exception e) {

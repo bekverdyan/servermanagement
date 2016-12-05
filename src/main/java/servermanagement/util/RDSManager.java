@@ -26,16 +26,6 @@ public class RDSManager {
 	private final static Logger logger = Logger.getLogger(RDSManager.class);
 
 	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
-
-//	public RDSManager(ConfigModel configModel, Consumer<EC2> rdsCreatedCallback) {
-//		this._confModel = configModel;
-//		this._rdsCreatedCallback = rdsCreatedCallback;
-//	}
-//
-//	public RDSManager(ConfigModel configModel) {
-//		this._confModel = configModel;
-//		_rdsCreatedCallback = null;
-//	}
 	
 	public RDSManager() {
 	}

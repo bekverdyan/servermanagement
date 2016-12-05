@@ -2,22 +2,22 @@ package main.java.servermanagement.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import model.ConfigModel;
+import model.EC2;
 
 import org.apache.log4j.Logger;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2Async;
 import com.amazonaws.services.ec2.AmazonEC2AsyncClient;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.StartInstancesRequest;
 import com.amazonaws.services.ec2.model.StartInstancesResult;
+import com.amazonaws.services.ec2.model.StopInstancesRequest;
 
 public class EC2Manager {
 
@@ -25,76 +25,88 @@ public class EC2Manager {
 
 	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
 
-	private AmazonEC2Async _ec2;
-	private ConfigModel _configModel;
+	// public EC2Manager(ConfigModel configModel, Consumer<EC2> ec2Callback) {
+	//
+	// _configModel = configModel;
+	// _ec2Callback = ec2Callback;
+	// }
+	//
+	// public EC2Manager(ConfigModel configModel) {
+	//
+	// _configModel = configModel;
+	// _ec2Callback = null;
+	// }
 
-	public EC2Manager(ConfigModel configModel) {
+	public EC2Manager() {
+	}
 
-		_configModel = configModel;
+	public String startEc2Instance(EC2 ec2) {
+		AmazonEC2AsyncClient client = getClient();
+		String ip = startServer(client, ec2);
+		client.shutdown();
 
+		return ip;
+	}
+
+	private AmazonEC2AsyncClient getClient() {
 		AWSCredentials credentials;
+		AmazonEC2AsyncClient client = null;
 		try {
 			credentials = new PropertiesCredentials(new File(CREDENTIAL_PATH));
-			_ec2 = new AmazonEC2AsyncClient(credentials);
-
+			client = new AmazonEC2AsyncClient(credentials);
+			client.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 		} catch (IllegalArgumentException | IOException e) {
 			logger.error(e);
 		}
+
+		return client;
 	}
 
-	public Map<String, String> startEc2Instances() {
+	private String startServer(AmazonEC2Async client, EC2 ec2) {
 
-		Map<String, String> ec2NameIdMap = _configModel.ec2.stream().collect(
-				Collectors.toMap(ConfigModel.EC2::getName,
-						ConfigModel.EC2::getId));
+		String ip = null;
+		try {
 
-		return startServers(_ec2, ec2NameIdMap);
-	}
+			StartInstancesRequest startRequest = new StartInstancesRequest()
+					.withInstanceIds(ec2.id);
 
-	private Map<String, String> startServers(AmazonEC2Async ec2,
-			Map<String, String> instanceIds) {
-		StartInstancesRequest startRequest = new StartInstancesRequest()
-				.withInstanceIds(instanceIds.values());
-
-		@SuppressWarnings("unused")
-		StartInstancesResult startResult = ec2.startInstances(startRequest);
-
-		Map<String, String> ec2ipMap = new HashMap<>();
-
-		instanceIds.forEach((name, instanceId) -> {
+			@SuppressWarnings("unused")
+			StartInstancesResult startResult = client
+					.startInstances(startRequest);
 
 			DescribeInstancesResult describeInstanceResult = null;
 			Integer instanceState = -1;
 			while (instanceState != 16) { // Loop until the instance is in the
 											// "running" state.
-					describeInstanceResult = getInstanceStatus(instanceId, ec2);
+				describeInstanceResult = getInstanceStatus(ec2.id, client);
 
-					instanceState = describeInstanceResult.getReservations()
-							.get(0).getInstances().get(0).getState().getCode();
+				instanceState = describeInstanceResult.getReservations().get(0)
+						.getInstances().get(0).getState().getCode();
 
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						logger.error(e);
-					}
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					logger.error(e);
 				}
+			}
 
-				logger.debug(name + " started");
+			logger.debug(ec2.name + " started");
 
-				String ip = describeInstanceResult
-						.getReservations()
-						.get(0)
-						.getInstances()
-						.stream()
-						.filter(instance -> instance.getTags().get(0)
-								.getValue().equals(name)).findAny().get()
-						.getPublicIpAddress();
+			ip = describeInstanceResult
+					.getReservations()
+					.get(0)
+					.getInstances()
+					.stream()
+					.filter(instance -> instance.getTags().stream()
+							.filter(tag -> tag.getKey().equals("Name"))
+							.findFirst().get().getValue().equals(ec2.name))
+					.findFirst().get().getPublicIpAddress();
 
-				ec2ipMap.put(name, ip);
+		} catch (Exception e) {
+			logger.error(e);
+		}
 
-			});
-
-		return ec2ipMap;
+		return ip;
 	}
 
 	// 0 : pending
@@ -119,5 +131,16 @@ public class EC2Manager {
 		// .getInstances().get(0).getPublicIpAddress();
 
 		return describeInstanceResult;
+	}
+
+	public void stopEc2Instance(EC2 ec2) {
+		AmazonEC2AsyncClient client = getClient();
+		stopServer(client, ec2);
+	}
+
+	private void stopServer(AmazonEC2Async client, EC2 ec2) {
+		StopInstancesRequest stopRequest = new StopInstancesRequest()
+				.withInstanceIds(ec2.id);
+		client.stopInstances(stopRequest);
 	}
 }

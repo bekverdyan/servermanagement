@@ -55,7 +55,6 @@ public class EC2Utils {
 			startServers(ec2, ids);
 
 			System.out.println("Complete");
-
 			/*
 			 * for (Instance instance : instances) {
 			 * System.out.println(String.format(print,

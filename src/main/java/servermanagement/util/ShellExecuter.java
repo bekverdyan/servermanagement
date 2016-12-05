@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import model.ConfigModel;
+import model.EC2;
 
 import org.apache.log4j.Logger;
 
@@ -31,7 +32,7 @@ public class ShellExecuter implements Closeable {
 	final static Logger logger = Logger.getLogger(ShellExecuter.class);
 
 	private static final String CODE_DIR_PATH = "/home/ubuntu/code/";
-
+	private static final String CONFIG_FILE_NAME = "config.js";
 	private static final String BUILD_AND_DEPLOY = CODE_DIR_PATH
 			+ "nabs/NABS/build_and_deploy.sh";
 
@@ -53,15 +54,10 @@ public class ShellExecuter implements Closeable {
 
 	private static final Map<String, String> projectOriginMap = new HashMap<>();
 	private static String USERNAME = "ubuntu"; // username for remote host
-	private static String REMOTE_HOME_DIR = "/home/ubuntu"; // username for
-															// remote host
-	// private static String PASSWORD ="password"; // password of the remote
-	// host
-	// private static String host = "35.156.179.132"; // remote host address
+	private static String REMOTE_HOME_DIR = "/home/ubuntu"; // username
+
 	private static int port = 22;
 	private static final String privateKey = "/home/sergeyhlghatyan/ssh_keys/NABS.pem";
-
-	private ExecutorService pool = Executors.newFixedThreadPool(4);
 
 	private ConfigModel configModel = null;
 	private Map<String, Session> sessionMap = new ConcurrentHashMap<String, Session>();
@@ -95,71 +91,101 @@ public class ShellExecuter implements Closeable {
 
 	public static void main(String[] args) {
 
-		ConfigModel config = ConfigUtils.loadConfigJson();
+		ConfigModel config = ConfigUtils.loadConfigJson(CONFIG_FILE_NAME);
 		try (final ShellExecuter shellExecuter = new ShellExecuter(config)) {
-
-			Map<String,String> map = new HashMap<String, String>();
-			map.put("qa-1", "35.156.179.132");
-			
-			 shellExecuter.buildAndDeploy(map);
-
-			// String command = " cd /home/ubuntu/temp; ./script.sh";
-			// shellExecuter.executeCommand(shellExecuter.getSession(),
-			// Command.from(command, "test"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public ShellExecuter(ConfigModel configModel) {
-		// setupLogging();
 		this.configModel = configModel;
 		this.initGitUrlsWithCredentials();
-		// this.session = this.openConnection();
 	}
 
-	public void buildAndDeploy(Map<String, String> ec2NameIpMap) {
+	public void buildAndDeploy(EC2 ec2) {
 
-		this.configModel.ec2.forEach(ec2 -> {
+		List<Command> commands = new ArrayList<Command>();
+		String host = ec2.ip;
 
-			List<Command> commands = new ArrayList<Command>();
-			String host = ec2NameIpMap.get(ec2.name);
+		if (host != null && host.length() > 6) {
 
-			if (host != null && host.length() > 6) {
+			ec2.branches.forEach((projectName, branch) -> {
 
-				ec2.branches.forEach((projectName, branch) -> {
-
+				// git fetch
 					commands.add(Command.from(this.getFetchCommand(
+							this.getProjectPath(projectName),
+							getRemoteOrigin(projectName), branch), ec2.name));
+
+					// git fetch tags
+					commands.add(Command.from(this.getTagFetchCommand(
 							this.getProjectPath(projectName),
 							getRemoteOrigin(projectName)), ec2.name));
 
-					commands.add(Command.from(
-							this.getCheckoutCommand(
-									this.getProjectPath(projectName), branch),
-							ec2.name));
-
+					// git pull needed branch
 					commands.add(Command.from(this.getPullCommand(
 							this.getProjectPath(projectName),
 							getRemoteOrigin(projectName), branch), ec2.name));
 
+					// checkout to branch
+					commands.add(Command.from(
+							this.getCheckoutCommand(
+									this.getProjectPath(projectName), branch),
+							ec2.name));
 				});
 
-				pool.execute(() -> {
-					this.openConnection(ec2.name, host);
-					String threadName = Thread.currentThread().getName();
-					logger.info("---------- start processing thread "
-							+ threadName + "-----------");
-					deploy(new ArrayList<ShellExecuter.Command>(commands),
-							ec2.name, threadName);
-					logger.info("---------- stop processing thread "
-							+ threadName + "-----------");
-				});
-			}
-		});
+			this.openConnection(ec2.name, host);
+			String threadName = Thread.currentThread().getName();
+			logger.info("---------- start processing thread " + threadName
+					+ "-----------");
+			pullBuildDeploy(new ArrayList<ShellExecuter.Command>(commands),
+					ec2.name, threadName);
+			logger.info("---------- stop processing thread " + threadName
+					+ "-----------");
+
+		}
+
 		logger.info("to delete");
 	}
 
-	private void deploy(List<Command> commands, String ec2Name, String tag) {
+	public void deploy(EC2 ec2) {
+
+		List<Command> commands = new ArrayList<Command>();
+		String host = ec2.ip;
+
+		this.openConnection(ec2.name, host);
+		String threadName = Thread.currentThread().getName();
+		logger.info("---------- start processing thread " + threadName
+				+ "-----------");
+		runDeployScripts(new ArrayList<ShellExecuter.Command>(commands),
+				ec2.name, threadName);
+		logger.info("---------- stop processing thread " + threadName
+				+ "-----------");
+
+		logger.info("to delete");
+	}
+
+	private void runDeployScripts(List<Command> commands, String ec2Name,
+			String tag) {
+
+		logger.info(tag + " start build and deploy for " + ec2Name);
+		// build and deploy
+		this.deployNabs(ec2Name, tag);
+		logger.info(tag + " end build and deploy " + ec2Name);
+
+		logger.info(tag + " start deploy on grid " + ec2Name);
+
+		// start grid and restart tomcat
+		String command = " cd " + REMOTE_HOME_DIR + "/temp; ./script.sh";
+		this.executeCommand(this.getSession(ec2Name),
+				Command.from(command, ec2Name), tag);
+
+		logger.info(tag + " end deploy on grid " + ec2Name);
+		logger.info(tag + "--------------- instance " + ec2Name + " is ready");
+	}
+
+	private void pullBuildDeploy(List<Command> commands, String ec2Name,
+			String tag) {
 
 		logger.info(tag
 				+ " start pull ing from get and checkout to branches for "
@@ -219,23 +245,35 @@ public class ShellExecuter implements Closeable {
 				branchName);
 	}
 
-	private String getFetchCommand(String projectPath, String remoteOrigin) {
-		return String.format("(cd %s && git fetch %s)", projectPath,
-				remoteOrigin);
+	private String getFetchCommand(String projectPath, String remoteOrigin,
+			String branch) {
+		return String.format("(cd %s && git fetch %s %s)", projectPath,
+				remoteOrigin, branch);
 	}
 
 	private String getPullCommand(String projectPath, String remoteOrigin,
 			String branchName) {
-		return String.format("(cd %s && git pull %s %s )", projectPath,
+		return String.format("(cd %s && git pull -f %s %s )", projectPath,
 				remoteOrigin, branchName);
 	}
 
-	private void buildAndDeployNabs(String ec2Name, String tag) {
-		this.executeCommand(
+	private String getTagFetchCommand(String projectPath, String remoteOrigin) {
+		return String.format("(cd %s && git fetch --tags %s)", projectPath,
+				remoteOrigin);
+	}
+
+	private boolean buildAndDeployNabs(String ec2Name, String tag) {
+		return this.executeCommand(
 				this.getSession(ec2Name),
 				Command.from(EXPORT_JAVA_6 + ";cd " + CODE_DIR_PATH
-						+ "nabs/NABS;" + "sh " + BUILD_AND_DEPLOY, ec2Name),
-				tag);
+						+ "nabs/NABS;" + "sh " + BUILD_NABS, ec2Name), tag);
+	}
+
+	private boolean deployNabs(String ec2Name, String tag) {
+		return this.executeCommand(
+				this.getSession(ec2Name),
+				Command.from(EXPORT_JAVA_6 + ";cd " + CODE_DIR_PATH
+						+ "nabs/NABS;" + "sh " + DEPLOY, ec2Name), tag);
 	}
 
 	private Session openConnection(String ec2, String host) {
@@ -297,9 +335,8 @@ public class ShellExecuter implements Closeable {
 		return result;
 	}
 
-	private List<String> executeCommand(Session session, Command command,
-			String tag) {
-		List<String> result = new ArrayList<String>();
+	private boolean executeCommand(Session session, Command command, String tag) {
+		boolean bret = true;
 		tag = tag + " ";
 		try {
 
@@ -339,7 +376,7 @@ public class ShellExecuter implements Closeable {
 			// list
 			// You can also simple print the result here
 			while ((line = reader.readLine()) != null) {
-				result.add(line);
+				// result.add(line);
 				logger.debug(tag + line);
 			}
 
@@ -362,8 +399,9 @@ public class ShellExecuter implements Closeable {
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+			bret = false;
 		}
-		return result;
+		return bret;
 	}
 
 	@Override

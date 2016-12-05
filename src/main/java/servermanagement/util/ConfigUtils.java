@@ -10,13 +10,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class ConfigUtils {
-	private static final String CONFIG_FILE_NAME = "config.js";
 
-	public static ConfigModel loadConfigJson() {
+
+	public static ConfigModel loadConfigJson(String path) {
 		ConfigModel config = null;
 
 		try {
-			String content = new String(Files.readAllBytes(Paths.get(CONFIG_FILE_NAME)));
+			String content = new String(Files.readAllBytes(Paths.get(path)));
 
 			GsonBuilder builder = new GsonBuilder();
 			Gson gson = builder.create();

@@ -3,6 +3,7 @@
 	"gitPassword": "RErPq2k4",
 	"ec2": [{
 		"id": "55",
+		"name": "qa-1",
 		"branches": {
 			"nabs": "master",
 			"foundation": "11.0",
@@ -13,6 +14,7 @@
 		}
 	}, {
 		"id": "55",
+		"name": "qa-2",
 		"branches": {
 			"nabs": "master",
 			"foundation": "11.0",

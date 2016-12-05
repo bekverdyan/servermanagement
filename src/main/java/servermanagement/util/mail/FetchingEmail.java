@@ -39,10 +39,9 @@ public class FetchingEmail {
     /** Global instance of the HTTP transport. */
     private static HttpTransport HTTP_TRANSPORT;
 
-    /** Global instance of the scopes required by this quickstart.
-     *
+    /**
      * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/gmail-java-quickstart
+     * at ~/.credentials/gmail-api
      */
     private static final List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
 

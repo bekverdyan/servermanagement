@@ -38,13 +38,13 @@ public class ConfigModel {
 		public void setBranches(Map<String, String> branches) {
 			this.branches = branches;
 		}
-		
-		
+
 	}
 
 	public String gitUserName;
 	public String gitPassword;
 	public List<EC2> ec2;
+	public String mailSender;
 
 	@Override
 	public String toString() {

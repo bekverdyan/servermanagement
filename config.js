@@ -23,5 +23,9 @@
 			"grid": "finmath_integration",
 			"finmath-adapter": "finmath-finval-adapter-0.4.8"
 		}
-	}]
+	}],
+
+	// Email configs
+	"mailSender": "aram.bekverdyan@gmail.com",
+	"credentialsFilePath": "/client_secret_gmail-api.json"
 }

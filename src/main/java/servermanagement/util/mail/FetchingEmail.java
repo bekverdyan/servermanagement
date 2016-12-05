@@ -16,6 +16,9 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import main.java.servermanagement.util.ConfigUtils;
+import model.ConfigModel;
+import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.util.Arrays;
@@ -23,51 +26,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FetchingEmail {
-    /** Application name. */
-    private static final String APPLICATION_NAME = "Gmail API";
-
-    /** Directory to store user credentials for this application. */
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/gmail-api");
-
-    /** Global instance of the {@link FileDataStoreFactory}. */
-    private static FileDataStoreFactory DATA_STORE_FACTORY;
-
-    /** Global instance of the JSON factory. */
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
-    /** Global instance of the HTTP transport. */
-    private static HttpTransport HTTP_TRANSPORT;
-
-    /** Global instance of the scopes required by this quickstart.
-     *
-     * If modifying these scopes, delete your previously saved credentials
-     * at ~/.credentials/gmail-java-quickstart
-     */
-    private static final List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
-
-    static {
-        try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Gmail service = getGmailService();
+    public JSONObject checkForEmail() throws IOException {
+        Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
         String user = "me";
+        ConfigModel configModel = ConfigUtils.loadConfigJson();
 
         ListMessagesResponse messagesResponse = service.users().messages().list(user)
-                .setQ("is:unread in:inbox from:aram.bekverdyan@gmail.com").execute();
-
+                .setQ("is:unread in:inbox from:" + configModel.mailSender).execute();
         List<Message> messages = messagesResponse.getMessages();
-
         List<String> messageIds = messages.stream().map(Message::getId).collect(Collectors.toList());
-
         Message msg;
+
+        JSONObject jsonObject = new JSONObject();
 
         for (String messageId : messageIds) {
             msg = service.users().messages().get(user, messageId).setFormat("raw").execute();
@@ -78,10 +48,22 @@ public class FetchingEmail {
 
             List<String> content = wholeMail.subList(wholeMail.indexOf("***BEGIN***") + 1, wholeMail.indexOf("***END***"));
 
-            //
 
-            System.out.println(content.toString());
+            for (String rawObject : content) {
+                try {
+                    parseAndPutIntoJson(jsonObject, rawObject);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+        return jsonObject;
+    }
+
+    private void parseAndPutIntoJson(JSONObject jsonObject, String raw) throws Exception {
+        String[] splitted = raw.split("\\s+");
+        jsonObject.put(splitted[0], splitted[1]);
     }
 
     /**
@@ -89,7 +71,7 @@ public class FetchingEmail {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public static Credential authorize() throws IOException {
+    /*public Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in =
                 FetchingEmail.class.getResourceAsStream("/client_secret_gmail-api.json");
@@ -108,21 +90,21 @@ public class FetchingEmail {
         System.out.println(
                 "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
-    }
+    }*/
 
     /**
      * Build and return an authorized Gmail client service.
      * @return an authorized Gmail client service
      * @throws IOException
      */
-    public static Gmail getGmailService() throws IOException {
+    /*public Gmail getGmailService() throws IOException {
         Credential credential = authorize();
         return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-    }
+    }*/
 
-    public static void getAttachments(Gmail service, String userId, String messageId)
+    public void getAttachments(Gmail service, String userId, String messageId)
             throws IOException {
         Message message = service.users().messages().get(userId, messageId).execute();
         List<MessagePart> parts = message.getPayload().getParts();

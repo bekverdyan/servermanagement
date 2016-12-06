@@ -3,7 +3,9 @@ package main.java.servermanagement.util;
 import java.io.IOException;
 import java.util.Map;
 
-import main.java.servermanagement.util.mail.FetchingEmail;
+import javax.mail.MessagingException;
+
+import main.java.servermanagement.util.mail.EmailUtils;
 import model.ConfigModel;
 
 import org.apache.log4j.Logger;
@@ -19,13 +21,23 @@ public class DeploymentManager {
      * Enable this part of code to check if there is a new requests for qa
      * server management
      */
-    FetchingEmail fetchingEmail = new FetchingEmail();
-    try {
+    EmailUtils fetchingEmail = new EmailUtils();
+
+    /*try {
+      fetchingEmail.sentEmail("sergey.hlghatyan@scdm.de", "Dvijeni ka ?", "Ka ha dvijeni ?"
+          + "BR"
+          + "Aram");
+    } catch (MessagingException | IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }*/
+
+    /*try {
       JSONObject jsonObject = fetchingEmail.checkForEmail();
       System.out.println(jsonObject.toJSONString());
     } catch (IOException e) {
       e.printStackTrace();
-    }
+    }*/
 
     /*ConfigModel config = ConfigUtils.loadConfigJson();
 

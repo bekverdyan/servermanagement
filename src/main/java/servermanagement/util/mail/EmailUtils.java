@@ -1,10 +1,17 @@
 package main.java.servermanagement.util.mail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import main.java.servermanagement.util.ConfigUtils;
 import model.ConfigModel;
@@ -22,7 +29,7 @@ import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
 
-public class FetchingEmail {
+public class EmailUtils {
   private static final String user = "me";
 
   public static void listLabels() throws IOException {
@@ -32,6 +39,46 @@ public class FetchingEmail {
     for (Label label : labels) {
       System.out.println(label.toPrettyString());
     }
+  }
+
+  public void sentEmail(String to, String subject, String bodyText) throws MessagingException, IOException {
+    MimeMessage emailContent = createEmail(to, subject, bodyText);
+
+    sendMessage(emailContent);
+  }
+
+  private MimeMessage createEmail(String to, String subject, String bodyText) throws MessagingException {
+    Properties props = new Properties();
+    Session session = Session.getDefaultInstance(props, null);
+
+    MimeMessage email = new MimeMessage(session);
+
+    email.setFrom(new InternetAddress(user));
+    email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
+    email.setSubject(subject);
+    email.setText(bodyText);
+
+    return email;
+  }
+
+  private Message sendMessage(MimeMessage emailContent) throws MessagingException,
+      IOException {
+    Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
+    Message message = createMessageWithEmail(emailContent);
+
+    message = service.users().messages().send(user, message).execute();
+
+    return message;
+  }
+
+  private Message createMessageWithEmail(MimeMessage emailContent) throws MessagingException, IOException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    emailContent.writeTo(buffer);
+    byte[] bytes = buffer.toByteArray();
+    String encodedEmail = Base64.encodeBase64URLSafeString(bytes);
+    Message message = new Message();
+    message.setRaw(encodedEmail);
+    return message;
   }
 
   private Message markaAsReadAndArchieveTheEmail(Gmail service, String emailId) throws IOException {

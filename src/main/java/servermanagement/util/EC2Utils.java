@@ -31,125 +31,110 @@ import com.amazonaws.services.ec2.model.StopInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 
 public class EC2Utils {
-	public static void main(String[] args) {
-		try {
-			AWSCredentials credentials = new PropertiesCredentials(new File(
-					"/home/sergeyhlghatyan/ssh_keys/aws/credentials"));
-			AmazonEC2Async ec2 = new AmazonEC2AsyncClient(credentials);
+  public static void main(String[] args) {
+    try {
+      AWSCredentials credentials = new PropertiesCredentials(new File("/home/sergeyhlghatyan/ssh_keys/aws/credentials"));
+      AmazonEC2Async ec2 = new AmazonEC2AsyncClient(credentials);
 
-			List<Instance> instances = new ArrayList<Instance>();
+      List<Instance> instances = new ArrayList<Instance>();
 
-			ec2.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+      ec2.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 
-			Filter filter = new Filter().withName("tag:BUNDESBANK").withValues(
-					"BUNDESBANK-EC2");
+      Filter filter = new Filter().withName("tag:BUNDESBANK").withValues("BUNDESBANK-EC2");
 
-			String print = "Instance Name: %s, Instance Id; %s";
+      String print = "Instance Name: %s, Instance Id; %s";
 
-			List<String> ids = new ArrayList<String>();
-			// ids.add("i-dc50dd60"); // 1
-			// ids.add("i-8c63d530"); // 2
-			ids.add("i-c3350c7f"); // 3
-			// ids.add("i-7ab936c6"); // 5
+      List<String> ids = new ArrayList<String>();
+      // ids.add("i-dc50dd60"); // 1
+      // ids.add("i-8c63d530"); // 2
+      ids.add("i-c3350c7f"); // 3
+      // ids.add("i-7ab936c6"); // 5
 
-			startServers(ec2, ids);
+      startServers(ec2, ids);
 
-			System.out.println("Complete");
+      System.out.println("Complete");
 
-			/*
-			 * for (Instance instance : instances) {
-			 * System.out.println(String.format(print,
-			 * instance.getTags().get(instance.getTags().indexOf(new
-			 * Tag().withKey("Name"))), instance.getInstanceId())); }
-			 */
+      /*
+       * for (Instance instance : instances) {
+       * System.out.println(String.format(print,
+       * instance.getTags().get(instance.getTags().indexOf(new
+       * Tag().withKey("Name"))), instance.getInstanceId())); }
+       */
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IllegalArgumentException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
-	public static Map<String, String> getInstances(AmazonEC2Async ec2,
-			Filter filter) {
-		Map<String, String> instances = new HashMap<String, String>();
-		DescribeInstancesRequest describeRequest = new DescribeInstancesRequest()
-				.withFilters(filter);
-		DescribeInstancesResult describeResult = ec2
-				.describeInstances(describeRequest);
+  public static Map<String, String> getInstances(AmazonEC2Async ec2, Filter filter) {
+    Map<String, String> instances = new HashMap<String, String>();
+    DescribeInstancesRequest describeRequest = new DescribeInstancesRequest().withFilters(filter);
+    DescribeInstancesResult describeResult = ec2.describeInstances(describeRequest);
 
-		String instanceName = null;
+    String instanceName = null;
 
-		for (Reservation reservation : describeResult.getReservations()) {
-			for (Instance instance : reservation.getInstances()) {
+    for (Reservation reservation : describeResult.getReservations()) {
+      for (Instance instance : reservation.getInstances()) {
 
-				for (Tag tag : instance.getTags()) {
-					if (StringUtils.equalsIgnoreCase(tag.getKey(), "Name")) {
-						instanceName = tag.getValue();
-						break;
-					}
-				}
+        for (Tag tag : instance.getTags()) {
+          if (StringUtils.equalsIgnoreCase(tag.getKey(), "Name")) {
+            instanceName = tag.getValue();
+            break;
+          }
+        }
 
-				instances.put(instance.getInstanceId(), instanceName);
-			}
-		}
+        instances.put(instance.getInstanceId(), instanceName);
+      }
+    }
 
-		return instances;
-	}
+    return instances;
+  }
 
-	public static List<InstanceStateChange> startServers(AmazonEC2Async ec2,
-			List<String> instanceIds) {
-		StartInstancesRequest startRequest = new StartInstancesRequest()
-				.withInstanceIds(instanceIds);
-		StartInstancesResult startResult = ec2.startInstances(startRequest);
+  public static List<InstanceStateChange> startServers(AmazonEC2Async ec2, List<String> instanceIds) {
+    StartInstancesRequest startRequest = new StartInstancesRequest().withInstanceIds(instanceIds);
+    StartInstancesResult startResult = ec2.startInstances(startRequest);
 
-		Integer instanceState = -1;
-		while (instanceState != 16) { // Loop until the instance is in the
-										// "running" state.
-			instanceState = getInstanceStatus(instanceIds.get(0), ec2);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-			}
-		}
+    Integer instanceState = -1;
+    while (instanceState != 16) { // Loop until the instance is in the
+      // "running" state.
+      instanceState = getInstanceStatus(instanceIds.get(0), ec2);
+      try {
+        Thread.sleep(5000);
+      } catch (InterruptedException e) {
+      }
+    }
 
-		System.out.println("started");
-		System.out.println(instanceState);
+    System.out.println("started");
+    System.out.println(instanceState);
 
-		return startResult.getStartingInstances();
-	}
+    return startResult.getStartingInstances();
+  }
 
-	// 0 : pending
-	// 16 : running
-	// 32 : shutting-down
-	// 48 : terminated
-	// 64 : stopping
-	// 80 : stopped
+  // 0 : pending
+  // 16 : running
+  // 32 : shutting-down
+  // 48 : terminated
+  // 64 : stopping
+  // 80 : stopped
 
-	public static Integer getInstanceStatus(String instanceId,
-			AmazonEC2Async ec2) {
-		DescribeInstancesRequest describeInstanceRequest = new DescribeInstancesRequest()
-				.withInstanceIds(instanceId);
-		DescribeInstancesResult describeInstanceResult = ec2
-				.describeInstances(describeInstanceRequest);
-		InstanceState state = describeInstanceResult.getReservations().get(0)
-				.getInstances().get(0).getState();
-		
-		
-		String ip = describeInstanceResult.getReservations().get(0)
-				.getInstances().get(0).getPublicIpAddress();
-		
-		return state.getCode();
-	}
+  public static Integer getInstanceStatus(String instanceId, AmazonEC2Async ec2) {
+    DescribeInstancesRequest describeInstanceRequest = new DescribeInstancesRequest().withInstanceIds(instanceId);
+    DescribeInstancesResult describeInstanceResult = ec2.describeInstances(describeInstanceRequest);
+    InstanceState state = describeInstanceResult.getReservations().get(0).getInstances().get(0).getState();
 
-	public static List<InstanceStateChange> stopServers(AmazonEC2Async ec2,
-			Collection<String> instanceIds) {
-		StopInstancesRequest stopRequest = new StopInstancesRequest()
-				.withInstanceIds(instanceIds);
-		StopInstancesResult stopResult = ec2.stopInstances(stopRequest);
+    String ip = describeInstanceResult.getReservations().get(0).getInstances().get(0).getPublicIpAddress();
 
-		return stopResult.getStoppingInstances();
-	}
+    return state.getCode();
+  }
+
+  public static List<InstanceStateChange> stopServers(AmazonEC2Async ec2, Collection<String> instanceIds) {
+    StopInstancesRequest stopRequest = new StopInstancesRequest().withInstanceIds(instanceIds);
+    StopInstancesResult stopResult = ec2.stopInstances(stopRequest);
+
+    return stopResult.getStoppingInstances();
+  }
 }

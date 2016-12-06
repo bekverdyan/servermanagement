@@ -41,21 +41,22 @@ public class RDSUtils {
       Set<String> inst = new HashSet<String>();
       inst.add("nabs-qa1");
       inst.add("nabs-qa2");
-      //inst.add("nabs-qa3");
-      //inst.add("nabs-qa5");
+      // inst.add("nabs-qa3");
+      // inst.add("nabs-qa5");
 
       List<DBInstance> futures = restoreDBFromSnapshot(rdsAsync, inst, "nabs-qa-17-may-2016");
 
-      //deleteDBInstances(rds, inst);
-      //rebootDBInstances(rdsAsync, inst);
-      
-      /*Filter filter = new Filter().withName("tag:BUNDESBANK").withValues("BUNDESBANK-RDS");
-      List<Filter> filters = new ArrayList<Filter>();
-      filters.add(filter);
-      for (String id : getDBInstances(rdsAsync, filters)) {
-        System.out.println(id);
-      }*/
-      
+      // deleteDBInstances(rds, inst);
+      // rebootDBInstances(rdsAsync, inst);
+
+      /*
+       * Filter filter = new
+       * Filter().withName("tag:BUNDESBANK").withValues("BUNDESBANK-RDS");
+       * List<Filter> filters = new ArrayList<Filter>(); filters.add(filter);
+       * for (String id : getDBInstances(rdsAsync, filters)) {
+       * System.out.println(id); }
+       */
+
       System.out.println("Complete");
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -127,13 +128,13 @@ public class RDSUtils {
     return futures;
   }
 
-  public static List<Future<DBInstance>> restoreDBFromSnapshotAsync(AmazonRDSAsync rds, Set<String> dbInstanceIdentifiers,
-      String snapshotIdentifier) {
+  public static List<Future<DBInstance>> restoreDBFromSnapshotAsync(AmazonRDSAsync rds,
+      Set<String> dbInstanceIdentifiers, String snapshotIdentifier) {
     List<Future<DBInstance>> futures = new ArrayList<Future<DBInstance>>();
     RestoreDBInstanceFromDBSnapshotRequest restoreRequest = null;
-    /*Tag tag = new Tag();
-    tag.setKey("Name");
-    tag.setValue("GAGO");*/
+    /*
+     * Tag tag = new Tag(); tag.setKey("Name"); tag.setValue("GAGO");
+     */
 
     for (String dbInstanceIdentifier : dbInstanceIdentifiers) {
       restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(dbInstanceIdentifier, snapshotIdentifier);

@@ -1,5 +1,6 @@
 package model;
 
+import java.util.List;
 import java.util.Map;
 
 public class EC2 {
@@ -8,10 +9,13 @@ public class EC2 {
 	public String rds;
 	public String ip;
 	public Map<String, String> branches;
+	public List<ReplaceConfig> replaceFiles;
+
 
 	@Override
 	public String toString() {
-		return "EC2 [id=" + id + ", branches=" + branches + "]";
+		return "EC2 [id=" + id + ", name=" + name + ", rds=" + rds + ", ip="
+				+ ip + "]";
 	}
 
 	public String getId() {

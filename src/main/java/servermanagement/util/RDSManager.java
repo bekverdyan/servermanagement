@@ -26,14 +26,17 @@ public class RDSManager {
 	private final static Logger logger = Logger.getLogger(RDSManager.class);
 
 	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
-	
+
 	public RDSManager() {
 	}
 
-	public void startRDSInstance(EC2 ec2,String snapshot) {
+	public String startRDSInstance(EC2 ec2, String snapshot) {
+		String endpoint = null;
 		AmazonRDSClient rdsClient = getClient();
-		restoreDBFromSnapshot(rdsClient, ec2,snapshot);
+		endpoint = restoreDBFromSnapshot(rdsClient, ec2, snapshot);
 		rdsClient.shutdown();
+
+		return endpoint;
 	}
 
 	private AmazonRDSClient getClient() {
@@ -54,18 +57,11 @@ public class RDSManager {
 		return rdsClient;
 	}
 
-	public void restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
+	public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
 			String snapshotIdentifier) {
 
+		String endpoint = null;
 		try {
-			try {
-				RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
-						ec2.rds, snapshotIdentifier).withDBInstanceClass("db.r3.xlarge");
-
-				rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
-			} catch (com.amazonaws.services.rds.model.DBInstanceAlreadyExistsException ex) {
-				logger.warn(ex);
-			}
 
 			DescribeDBInstancesRequest dbInstancesRequest = new DescribeDBInstancesRequest()
 					.withDBInstanceIdentifier(ec2.rds);
@@ -75,22 +71,43 @@ public class RDSManager {
 			String instanceState = describeDBInstancesResult.getDBInstances()
 					.get(0).getDBInstanceStatus();
 
-			while (!instanceState.equals("available")) {
-				describeDBInstancesResult = rds
-						.describeDBInstances(dbInstancesRequest);
+			endpoint = describeDBInstancesResult.getDBInstances().get(0)
+					.getEndpoint().getAddress();
 
-				instanceState = describeDBInstancesResult.getDBInstances()
-						.get(0).getDBInstanceStatus();
-
+			if (!instanceState.equals("available")) {
 				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					logger.error(e);
+
+					RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
+							ec2.rds, snapshotIdentifier)
+							.withDBInstanceClass("db.r3.xlarge");
+					rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
+
+				} catch (com.amazonaws.services.rds.model.DBInstanceAlreadyExistsException ex) {
+					logger.warn(ex);
+				}
+
+				while (!instanceState.equals("available")) {
+					describeDBInstancesResult = rds
+							.describeDBInstances(dbInstancesRequest);
+
+					instanceState = describeDBInstancesResult.getDBInstances()
+							.get(0).getDBInstanceStatus();
+
+					endpoint = describeDBInstancesResult.getDBInstances()
+							.get(0).getEndpoint().getAddress();
+
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						logger.error(e);
+					}
 				}
 			}
 		} catch (Exception e2) {
 			logger.error(e2);
 		}
+
+		return endpoint;
 	}
 
 	public void stopRDSInstance(EC2 ec2) {

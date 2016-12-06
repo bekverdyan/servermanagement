@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 
 import model.ConfigModel;
 import model.EC2;
+import model.KeyValuePair;
 
 import org.apache.log4j.Logger;
 
 public class DeploymentManager {
 
-	private static final String CONFIG_FILE_NAME = "config.js";
+	private static final String CONFIG_FILE_NAME = "config2.js";
 	private final static Logger logger = Logger
 			.getLogger(DeploymentManager.class);
 
@@ -21,16 +22,16 @@ public class DeploymentManager {
 		ConfigModel configModel = ConfigUtils.loadConfigJson(CONFIG_FILE_NAME);
 
 		List<String> ec2List = new ArrayList<String>();
-		ec2List.add("NABS-QA-31");
+		ec2List.add("NABS-QA-41");
 
 		List<EC2> ecToProcess = configModel.ec2.stream()
 				.filter(ec -> ec2List.contains(ec.name))
 				.collect(Collectors.toList());
 
-		boolean buildAndDeploy = false;
+		boolean buildAndDeploy = true;
 
 		start(configModel, ecToProcess, buildAndDeploy);
-		//stop(configModel,ecToProcess);
+		// stop(configModel,ecToProcess);
 	}
 
 	public static void start(ConfigModel configModel, List<EC2> ecToProcess,
@@ -48,8 +49,22 @@ public class DeploymentManager {
 							() -> {
 								try {
 
-									rdsManager.startRDSInstance(ec2,
-											configModel.snapshot);
+									String endpoint = rdsManager
+											.startRDSInstance(ec2,
+													configModel.snapshot);
+
+									KeyValuePair kvPair = ec2.replaceFiles
+											.stream()
+											.filter(el -> el.file
+													.contains("NABS-java"))
+											.findFirst().get().keyWords
+											.stream()
+											.filter(kv -> kv.key
+													.equals("db_connection_url"))
+											.findFirst().get();
+
+									kvPair.value = "=" + endpoint;
+
 									ec2.ip = ec2Manager.startEc2Instance(ec2);
 
 									try (final ShellExecuter shellExecuter = new ShellExecuter(

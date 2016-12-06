@@ -118,9 +118,10 @@ public class RDSUtils {
       String snapshotIdentifier) {
     List<DBInstance> futures = new ArrayList<DBInstance>();
     RestoreDBInstanceFromDBSnapshotRequest restoreRequest = null;
+    
 
     for (String dbInstanceIdentifier : dbInstanceIdentifiers) {
-      restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(dbInstanceIdentifier, snapshotIdentifier);
+      restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(dbInstanceIdentifier, snapshotIdentifier).withDBInstanceClass("db.r3.xlarge");
       futures.add(rds.restoreDBInstanceFromDBSnapshot(restoreRequest));
     }
 

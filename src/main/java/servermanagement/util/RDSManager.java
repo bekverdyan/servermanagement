@@ -60,7 +60,7 @@ public class RDSManager {
 		try {
 			try {
 				RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
-						ec2.rds, snapshotIdentifier);
+						ec2.rds, snapshotIdentifier).withDBInstanceClass("db.r3.xlarge");
 
 				rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
 			} catch (com.amazonaws.services.rds.model.DBInstanceAlreadyExistsException ex) {

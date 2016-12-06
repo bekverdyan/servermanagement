@@ -29,8 +29,8 @@ public class DeploymentManager {
 
 		boolean buildAndDeploy = false;
 
-		//start(configModel, ecToProcess, buildAndDeploy);
-		stop(configModel,ecToProcess);
+		start(configModel, ecToProcess, buildAndDeploy);
+		//stop(configModel,ecToProcess);
 	}
 
 	public static void start(ConfigModel configModel, List<EC2> ecToProcess,

@@ -1,11 +1,13 @@
 package main.java.servermanagement.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
+import main.java.servermanagement.util.mail.EmailUtils;
 import model.ConfigModel;
 import model.EC2;
 import model.KeyValuePair;
@@ -18,129 +20,160 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 public class DeploymentManager {
 
-	private static final String CONFIG_FILE_NAME = "config2.js";
-	private final static Logger logger = Logger
-			.getLogger(DeploymentManager.class);
+    private static final String CONFIG_FILE_NAME = "config2.js";
+    private final static Logger logger = Logger
+            .getLogger(DeploymentManager.class);
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		if (args.length > 0) {
+        if (args.length > 0) {
 
-			Options options = new Options();
+            Options options = new Options();
 
-			Option input = new Option("c", "input", true, "input file path");
-			input.setRequired(true);
-			options.addOption(input);
+            Option input = new Option("c", "input", true, "input file path");
+            input.setRequired(true);
+            options.addOption(input);
 
-			CommandLineParser parser = new GnuParser();
-			HelpFormatter formatter = new HelpFormatter();
-			CommandLine cmd;
+            CommandLineParser parser = new GnuParser();
+            HelpFormatter formatter = new HelpFormatter();
+            CommandLine cmd;
 
-			try {
-				cmd = parser.parse(options, args);
-			} catch (ParseException e) {
-				System.out.println(e.getMessage());
-				formatter.printHelp("utility-name", options);
+            try {
+                cmd = parser.parse(options, args);
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+                formatter.printHelp("utility-name", options);
 
-				System.exit(1);
-				return;
-			}
+                System.exit(1);
+                return;
+            }
 
-			String inputFilePath = cmd.getOptionValue("c");
+            String inputFilePath = cmd.getOptionValue("c");
 
-			ConfigModel configModel = ConfigUtils
-					.loadConfigJson(inputFilePath);
+            ConfigModel configModel = ConfigUtils
+                    .loadConfigJson(inputFilePath);
 
-			List<String> ec2List = new ArrayList<String>();
-			ec2List.add("NABS-QA-41");
+//			List<String> ec2List = new ArrayList<String>();
+//			ec2List.add("NABS-QA-41");
+//
+//			List<EC2> ecToProcess = configModel.ec2.stream()
+//					.filter(ec -> ec2List.contains(ec.name))
+//					.collect(Collectors.toList());
+//
+//			boolean buildAndDeploy = false;
+//
+//			start(configModel, ecToProcess, buildAndDeploy);
 
-			List<EC2> ecToProcess = configModel.ec2.stream()
-					.filter(ec -> ec2List.contains(ec.name))
-					.collect(Collectors.toList());
 
-			boolean buildAndDeploy = false;
+            logger.info(configModel);
 
-			start(configModel, ecToProcess, buildAndDeploy);
 
-		} else {
-			logger.error("please provide config file");
-			System.exit(1);
-		}
+            EmailUtils emailUtils = new EmailUtils();
 
-		// stop(configModel,ecToProcess);
-	}
+            try {
+                while(true){
+                    System.out.println("e");
 
-	public static void start(ConfigModel configModel, List<EC2> ecToProcess,
-			boolean buildAndDeploy) {
 
-		EC2Manager ec2Manager = new EC2Manager();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
 
-		RDSManager rdsManager = new RDSManager();
+                //JSONObject json = emailUtils.checkForEmail(configModel);
 
-		ThreadFactory service = Executors.defaultThreadFactory();
 
-		ecToProcess
-				.forEach(ec2 -> {
-					service.newThread(
-							() -> {
-								try {
+            } catch (Exception e) {
+                logger.error(e);
+            }
 
-									String endpoint = rdsManager
-											.startRDSInstance(ec2,
-													configModel.snapshot);
 
-									KeyValuePair kvPair = ec2.replaceFiles
-											.stream()
-											.filter(el -> el.file
-													.contains("NABS-java"))
-											.findFirst().get().keyWords
-											.stream()
-											.filter(kv -> kv.key
-													.equals("db_connection_url"))
-											.findFirst().get();
+        } else {
+            logger.error("please provide config file");
+            System.exit(1);
+        }
 
-									kvPair.value = "=" + endpoint;
+        // stop(configModel,ecToProcess);
+    }
 
-									ec2.ip = ec2Manager.startEc2Instance(ec2);
+    public static void start(ConfigModel configModel, List<EC2> ecToProcess,
+                             boolean buildAndDeploy) {
 
-									try (final ShellExecuter shellExecuter = new ShellExecuter(
-											configModel)) {
-										if (buildAndDeploy) {
-											shellExecuter.buildAndDeploy(ec2);
-										} else {
-											shellExecuter.deploy(ec2);
-										}
-									} catch (Exception e) {
-										logger.error(e);
-									}
-								} catch (Exception e) {
-									logger.error(e);
-								}
+        EC2Manager ec2Manager = new EC2Manager();
 
-							}).start();
-				});
-	}
+        RDSManager rdsManager = new RDSManager();
 
-	public static void stop(ConfigModel configModel, List<EC2> ecToProcess) {
+        ThreadFactory service = Executors.defaultThreadFactory();
 
-		EC2Manager ec2Manager = new EC2Manager();
+        ecToProcess
+                .forEach(ec2 -> {
+                    service.newThread(
+                            () -> {
+                                try {
 
-		RDSManager rdsManager = new RDSManager();
+                                    String endpoint = rdsManager
+                                            .startRDSInstance(ec2,
+                                                    configModel.snapshot);
 
-		ThreadFactory service = Executors.defaultThreadFactory();
+                                    KeyValuePair kvPair = ec2.replaceFiles
+                                            .stream()
+                                            .filter(el -> el.file
+                                                    .contains("NABS-java"))
+                                            .findFirst()
+                                            .get().keyWords
+                                            .stream()
+                                            .filter(kv -> kv.key
+                                                    .equals("db_connection_url"))
+                                            .findFirst()
+                                            .get();
 
-		ecToProcess.forEach(ec2 -> {
-			service.newThread(() -> {
-				try {
-					rdsManager.stopRDSInstance(ec2);
-					ec2Manager.stopEc2Instance(ec2);
-				} catch (Exception e) {
-					logger.error(e);
-				}
-			}).start();
-		});
-	}
+                                    kvPair.value = "=" + endpoint;
+
+                                    ec2.ip = ec2Manager.startEc2Instance(ec2);
+
+                                    try (final ShellExecuter shellExecuter = new ShellExecuter(
+                                            configModel)) {
+                                        if (buildAndDeploy) {
+                                            shellExecuter.buildAndDeploy(ec2);
+                                        } else {
+                                            shellExecuter.deploy(ec2);
+                                        }
+                                    } catch (Exception e) {
+                                        logger.error(e);
+                                    }
+                                } catch (Exception e) {
+                                    logger.error(e);
+                                }
+
+                            })
+                            .start();
+                });
+    }
+
+    public static void stop(ConfigModel configModel, List<EC2> ecToProcess) {
+
+        EC2Manager ec2Manager = new EC2Manager();
+
+        RDSManager rdsManager = new RDSManager();
+
+        ThreadFactory service = Executors.defaultThreadFactory();
+
+        ecToProcess.forEach(ec2 -> {
+            service.newThread(() -> {
+                try {
+                    rdsManager.stopRDSInstance(ec2);
+                    ec2Manager.stopEc2Instance(ec2);
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            })
+                    .start();
+        });
+    }
 }

@@ -15,4 +15,9 @@
 		}
 	}],
 	"snapshot": "nabs-qa"
+	}],
+
+	// Email configs
+	"mailSender": "aram.bekverdyan@gmail.com",
+	"credentialsFilePath": "/client_secret_gmail-api.json"
 }

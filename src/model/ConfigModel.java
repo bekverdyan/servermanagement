@@ -9,6 +9,7 @@ public class ConfigModel {
 	public List<EC2> ec2;
 	
 	public String snapshot;
+	 public String mailSender;
 
 	@Override
 	public String toString() {

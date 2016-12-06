@@ -30,7 +30,7 @@ public class RDSManager {
 	public RDSManager() {
 	}
 
-	public String startRDSInstance(EC2 ec2, String snapshot) {
+	public String startRDSInstance(EC2 ec2, String snapshot) throws Exception {
 		String endpoint = null;
 		AmazonRDSClient rdsClient = getClient();
 		endpoint = restoreDBFromSnapshot(rdsClient, ec2, snapshot);
@@ -58,7 +58,7 @@ public class RDSManager {
 	}
 
 	public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
-			String snapshotIdentifier) {
+			String snapshotIdentifier) throws Exception {
 
 		String endpoint = null;
 		try {
@@ -105,6 +105,7 @@ public class RDSManager {
 			}
 		} catch (Exception e2) {
 			logger.error(e2);
+			throw e2;
 		}
 
 		return endpoint;

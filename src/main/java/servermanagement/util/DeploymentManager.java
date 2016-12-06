@@ -10,6 +10,13 @@ import model.ConfigModel;
 import model.EC2;
 import model.KeyValuePair;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
 public class DeploymentManager {
@@ -19,18 +26,50 @@ public class DeploymentManager {
 			.getLogger(DeploymentManager.class);
 
 	public static void main(String[] args) {
-		ConfigModel configModel = ConfigUtils.loadConfigJson(CONFIG_FILE_NAME);
 
-		List<String> ec2List = new ArrayList<String>();
-		ec2List.add("NABS-QA-41");
+		if (args.length > 0) {
 
-		List<EC2> ecToProcess = configModel.ec2.stream()
-				.filter(ec -> ec2List.contains(ec.name))
-				.collect(Collectors.toList());
+			Options options = new Options();
 
-		boolean buildAndDeploy = true;
+			Option input = new Option("c", "input", true, "input file path");
+			input.setRequired(true);
+			options.addOption(input);
 
-		start(configModel, ecToProcess, buildAndDeploy);
+			CommandLineParser parser = new GnuParser();
+			HelpFormatter formatter = new HelpFormatter();
+			CommandLine cmd;
+
+			try {
+				cmd = parser.parse(options, args);
+			} catch (ParseException e) {
+				System.out.println(e.getMessage());
+				formatter.printHelp("utility-name", options);
+
+				System.exit(1);
+				return;
+			}
+
+			String inputFilePath = cmd.getOptionValue("c");
+
+			ConfigModel configModel = ConfigUtils
+					.loadConfigJson(inputFilePath);
+
+			List<String> ec2List = new ArrayList<String>();
+			ec2List.add("NABS-QA-41");
+
+			List<EC2> ecToProcess = configModel.ec2.stream()
+					.filter(ec -> ec2List.contains(ec.name))
+					.collect(Collectors.toList());
+
+			boolean buildAndDeploy = false;
+
+			start(configModel, ecToProcess, buildAndDeploy);
+
+		} else {
+			logger.error("please provide config file");
+			System.exit(1);
+		}
+
 		// stop(configModel,ecToProcess);
 	}
 

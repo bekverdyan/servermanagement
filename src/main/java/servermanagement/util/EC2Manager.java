@@ -28,7 +28,7 @@ public class EC2Manager {
 	public EC2Manager() {
 	}
 
-	public String startEc2Instance(EC2 ec2) {
+	public String startEc2Instance(EC2 ec2) throws Exception {
 		AmazonEC2AsyncClient client = getClient();
 		String ip = startServer(client, ec2);
 		client.shutdown();
@@ -49,7 +49,7 @@ public class EC2Manager {
 		return client;
 	}
 
-	private String startServer(AmazonEC2Async client, EC2 ec2) {
+	private String startServer(AmazonEC2Async client, EC2 ec2) throws Exception {
 		String ip = null;
 		try {
 
@@ -61,7 +61,12 @@ public class EC2Manager {
 					.startInstances(startRequest);
 
 			DescribeInstancesResult describeInstanceResult = null;
-			Integer instanceState = -1;
+			
+			describeInstanceResult = getInstanceStatus(ec2.id, client);
+
+			Integer instanceState = describeInstanceResult.getReservations().get(0)
+					.getInstances().get(0).getState().getCode();
+			
 			while (instanceState != 16) { // Loop until the instance is in the
 											// "running" state.
 				describeInstanceResult = getInstanceStatus(ec2.id, client);
@@ -90,6 +95,7 @@ public class EC2Manager {
 
 		} catch (Exception e) {
 			logger.error(e);
+			throw e;
 		}
 
 		return ip;

@@ -294,7 +294,7 @@ public class ShellExecuter implements Closeable {
 		logger.info("to delete");
 	}
 
-	public void deploy(EC2 ec2) {
+	public void deploy(EC2 ec2) throws Exception {
 
 		List<Command> commands = new ArrayList<Command>();
 
@@ -311,12 +311,12 @@ public class ShellExecuter implements Closeable {
 	}
 
 	private void runDeployScripts(List<Command> commands, String ec2Name,
-			String tag) {
+			String tag) throws Exception {
 
-		logger.info(tag + " start build and deploy for " + ec2Name);
-		// build and deploy
+		logger.info(tag + " start deploy for " + ec2Name);
+		// deploy
 		this.deployNabs(ec2Name, tag);
-		logger.info(tag + " end build and deploy " + ec2Name);
+		logger.info(tag + " end deploy " + ec2Name);
 
 		logger.info(tag + " start deploy on grid " + ec2Name);
 
@@ -417,14 +417,14 @@ public class ShellExecuter implements Closeable {
 				remoteOrigin);
 	}
 
-	private boolean buildAndDeployNabs(String ec2Name, String tag) {
+	private boolean buildAndDeployNabs(String ec2Name, String tag) throws Exception {
 		return this.executeCommand(
 				this.getSession(ec2Name),
 				Command.from(EXPORT_JAVA_6 + ";cd " + CODE_DIR_PATH
 						+ "nabs/NABS;" + "sh " + BUILD_NABS, ec2Name), tag);
 	}
 
-	private boolean deployNabs(String ec2Name, String tag) {
+	private boolean deployNabs(String ec2Name, String tag) throws Exception {
 		return this.executeCommand(
 				this.getSession(ec2Name),
 				Command.from(EXPORT_JAVA_6 + ";cd " + CODE_DIR_PATH
@@ -490,11 +490,11 @@ public class ShellExecuter implements Closeable {
 		return result;
 	}
 
-	private boolean executeCommand(Session session, Command command) {
+	private boolean executeCommand(Session session, Command command) throws Exception {
 		return executeCommand(session, command, command.tag);
 	}
 
-	private boolean executeCommand(Session session, Command command, String tag) {
+	private boolean executeCommand(Session session, Command command, String tag) throws Exception{
 		boolean bret = true;
 		tag = tag + " ";
 		try {
@@ -559,6 +559,7 @@ public class ShellExecuter implements Closeable {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			bret = false;
+			throw e;
 		}
 		return bret;
 	}

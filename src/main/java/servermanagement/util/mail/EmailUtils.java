@@ -3,6 +3,7 @@ package main.java.servermanagement.util.mail;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 import main.java.servermanagement.util.ConfigUtils;
 import model.ConfigModel;
 
+import model.EmailCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 
@@ -30,6 +32,7 @@ import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
 
 public class EmailUtils {
+  private Gmail service = null;
   private static final String user = "me";
 
   public static void listLabels() throws IOException {
@@ -38,6 +41,14 @@ public class EmailUtils {
     List<Label> labels = response.getLabels();
     for (Label label : labels) {
       System.out.println(label.toPrettyString());
+    }
+  }
+
+  public EmailUtils() {
+    try {
+      service = GmailServiceBuilder.INSTANCE.getGmailService();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -88,37 +99,49 @@ public class EmailUtils {
     return service.users().messages().modify(user, emailId, mods).execute();
   }
 
-  public JSONObject checkForEmail(ConfigModel configModel) throws IOException {
-    Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
+  public List<EmailCommand> checkForEmail(ConfigModel configModel) throws IOException {
+    List<EmailCommand> commands = new ArrayList<>();
 
     ListMessagesResponse messagesResponse = service.users().messages().list(user)
         .setQ("is:unread in:inbox from:" + configModel.mailSender).execute();
     List<Message> messages = messagesResponse.getMessages();
-    List<String> messageIds = messages.stream().map(Message::getId).collect(Collectors.toList());
-    Message msg;
 
-    JSONObject jsonObject = new JSONObject();
+    JSONObject jsonObject = null;
+    if(messages != null) {
 
-    for (String messageId : messageIds) {
-      msg = service.users().messages().get(user, messageId).setFormat("raw").execute();
-      String messageContentRaw = msg.getSnippet();
+      List<String> messageIds = messages.stream()
+              .map(Message::getId)
+              .collect(Collectors.toList());
+      Message msg;
 
-      List<String> messageContent = Arrays.asList(messageContentRaw.split(","));
+      jsonObject = new JSONObject();
 
-      for (String rawObject : messageContent) {
-        try {
-          rawObject = StringUtils.removeStart(rawObject, " ");
-          rawObject = StringUtils.removeEnd(rawObject, " ");
-          parseAndPutIntoJson(jsonObject, rawObject);
-        } catch (Exception e) {
-          e.printStackTrace();
+      for (String messageId : messageIds) {
+        msg = service.users()
+                .messages()
+                .get(user, messageId)
+                .setFormat("raw")
+                .execute();
+        String messageContentRaw = msg.getSnippet();
+
+        List<String> messageContent = Arrays.asList(messageContentRaw.split(","));
+
+        for (String rawObject : messageContent) {
+          try {
+            rawObject = StringUtils.removeStart(rawObject, " ");
+            rawObject = StringUtils.removeEnd(rawObject, " ");
+            //parseAndPutIntoJson(jsonObject, rawObject);
+            commands.add(EmailCommand.createFromRawValue(rawObject));
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
-      }
 
-      markaAsReadAndArchieveTheEmail(service, messageId);
+        markaAsReadAndArchieveTheEmail(service, messageId);
+      }
     }
 
-    return jsonObject;
+    return commands;
   }
 
   @SuppressWarnings("unchecked")

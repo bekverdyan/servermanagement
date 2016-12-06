@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import main.java.servermanagement.util.mail.EmailUtils;
 import model.ConfigModel;
 import model.EC2;
+import model.EmailCommand;
 import model.KeyValuePair;
 
 import org.apache.commons.cli.CommandLine;
@@ -30,133 +31,129 @@ public class DeploymentManager {
 
     public static void main(String[] args) {
 
-        if (args.length > 0) {
 
-            Options options = new Options();
-
-            Option input = new Option("c", "input", true, "input file path");
-            input.setRequired(true);
-            options.addOption(input);
-
-            CommandLineParser parser = new GnuParser();
-            HelpFormatter formatter = new HelpFormatter();
-            CommandLine cmd;
-
-            try {
-                cmd = parser.parse(options, args);
-            } catch (ParseException e) {
-                System.out.println(e.getMessage());
-                formatter.printHelp("utility-name", options);
-
-                System.exit(1);
-                return;
-            }
-
-            String inputFilePath = cmd.getOptionValue("c");
-
-            ConfigModel configModel = ConfigUtils
-                    .loadConfigJson(inputFilePath);
-
-//			List<String> ec2List = new ArrayList<String>();
-//			ec2List.add("NABS-QA-41");
+//            Options options = new Options();
 //
-//			List<EC2> ecToProcess = configModel.ec2.stream()
-//					.filter(ec -> ec2List.contains(ec.name))
-//					.collect(Collectors.toList());
+//            Option input = new Option("c", "input", true, "input file path");
+//            input.setRequired(true);
+//            options.addOption(input);
 //
-//			boolean buildAndDeploy = false;
+//            CommandLineParser parser = new GnuParser();
+//            HelpFormatter formatter = new HelpFormatter();
+//            CommandLine cmd;
 //
-//			start(configModel, ecToProcess, buildAndDeploy);
+//            try {
+//                cmd = parser.parse(options, args);
+//            } catch (ParseException e) {
+//                System.out.println(e.getMessage());
+//                formatter.printHelp("utility-name", options);
+//
+//                System.exit(1);
+//                return;
+//            }
+//
+//            String inputFilePath = cmd.getOptionValue("c");
+
+        ConfigModel configModel = ConfigUtils
+                .loadConfigJson(CONFIG_FILE_NAME);
 
 
-            logger.info(configModel);
+        logger.info(configModel);
+
+//
+//        EmailUtils emailUtils = new EmailUtils();
+//
+//        try {
+//            while (true) {
+//                List<EmailCommand> commands = emailUtils.checkForEmail(configModel);
+//
+//                logger.warn(commands);
+//                if (!commands.isEmpty()) {
+//
+//                    commands.forEach(el -> {
+//                        if (el.command.equals("start")) {
+//                            start(emailUtils,configModel, el.ec2Name, false);
+//                        } else {
+//                            stop(emailUtils,configModel, el.ec2Name);
+//                        }
+//                    });
+//                }
+//                try {
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException e) {
+//                    logger.error(e);
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error(e);
+//        }
 
 
-            EmailUtils emailUtils = new EmailUtils();
-
-            try {
-                while(true){
-                    System.out.println("e");
-
-
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        logger.error(e);
-                    }
-                }
-
-                //JSONObject json = emailUtils.checkForEmail(configModel);
-
-
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-
-        } else {
-            logger.error("please provide config file");
-            System.exit(1);
-        }
+        start(null,configModel,"NABS-QA-41" , false);
 
         // stop(configModel,ecToProcess);
     }
 
-    public static void start(ConfigModel configModel, List<EC2> ecToProcess,
+    public static void start(EmailUtils emailUtils, ConfigModel configModel, String ec2Name,
                              boolean buildAndDeploy) {
 
         EC2Manager ec2Manager = new EC2Manager();
 
         RDSManager rdsManager = new RDSManager();
 
+        EC2 ec2 = configModel.ec2.stream()
+                .filter(el -> el.name.equals(ec2Name))
+                .findFirst()
+                .get();
+
         ThreadFactory service = Executors.defaultThreadFactory();
 
-        ecToProcess
-                .forEach(ec2 -> {
-                    service.newThread(
-                            () -> {
-                                try {
+        service.newThread(
+                () -> {
+                    try {
 
-                                    String endpoint = rdsManager
-                                            .startRDSInstance(ec2,
-                                                    configModel.snapshot);
+                        String endpoint = rdsManager
+                                .startRDSInstance(ec2,
+                                        configModel.snapshot);
 
-                                    KeyValuePair kvPair = ec2.replaceFiles
-                                            .stream()
-                                            .filter(el -> el.file
-                                                    .contains("NABS-java"))
-                                            .findFirst()
-                                            .get().keyWords
-                                            .stream()
-                                            .filter(kv -> kv.key
-                                                    .equals("db_connection_url"))
-                                            .findFirst()
-                                            .get();
+                        KeyValuePair kvPair = ec2.replaceFiles
+                                .stream()
+                                .filter(el -> el.file
+                                        .contains("NABS-java"))
+                                .findFirst()
+                                .get().keyWords
+                                .stream()
+                                .filter(kv -> kv.key
+                                        .equals("db_connection_url"))
+                                .findFirst()
+                                .get();
 
-                                    kvPair.value = "=" + endpoint;
+                        kvPair.value = "=" + endpoint;
 
-                                    ec2.ip = ec2Manager.startEc2Instance(ec2);
+                        ec2.ip = ec2Manager.startEc2Instance(ec2);
 
-                                    try (final ShellExecuter shellExecuter = new ShellExecuter(
-                                            configModel)) {
-                                        if (buildAndDeploy) {
-                                            shellExecuter.buildAndDeploy(ec2);
-                                        } else {
-                                            shellExecuter.deploy(ec2);
-                                        }
-                                    } catch (Exception e) {
-                                        logger.error(e);
-                                    }
-                                } catch (Exception e) {
-                                    logger.error(e);
-                                }
+                        try (final ShellExecuter shellExecuter = new ShellExecuter(
+                                configModel)) {
+                            if (buildAndDeploy) {
+                                shellExecuter.buildAndDeploy(ec2);
+                            } else {
+                                shellExecuter.deploy(ec2);
+                            }
+                        } catch (Exception e) {
+                            logger.error(e);
+                            throw e;
+                        }
 
-                            })
-                            .start();
-                });
+                        //emailUtils.sentEmail(configModel.mailSender, "server start", "servers are succesfully started");
+
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                })
+                .start();
     }
 
-    public static void stop(ConfigModel configModel, List<EC2> ecToProcess) {
+    public static void stop(EmailUtils emailUtils, ConfigModel configModel, String ec2Name) {
 
         EC2Manager ec2Manager = new EC2Manager();
 
@@ -164,16 +161,23 @@ public class DeploymentManager {
 
         ThreadFactory service = Executors.defaultThreadFactory();
 
-        ecToProcess.forEach(ec2 -> {
-            service.newThread(() -> {
-                try {
-                    rdsManager.stopRDSInstance(ec2);
-                    ec2Manager.stopEc2Instance(ec2);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            })
-                    .start();
-        });
+
+        EC2 ec2 = configModel.ec2.stream()
+                .filter(el -> el.name.equals(ec2Name))
+                .findFirst()
+                .get();
+
+        service.newThread(() -> {
+            try {
+                rdsManager.stopRDSInstance(ec2);
+                ec2Manager.stopEc2Instance(ec2);
+
+                emailUtils.sentEmail(configModel.mailSender, "server start", "servers are succesfully started");
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        })
+                .start();
+
     }
 }

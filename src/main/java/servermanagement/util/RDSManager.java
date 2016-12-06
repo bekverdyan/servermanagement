@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.amazonaws.services.rds.AmazonRDSAsyncClient;
 import model.EC2;
 
 import org.apache.log4j.Logger;
@@ -39,18 +40,20 @@ public class RDSManager {
 		return endpoint;
 	}
 
-	private AmazonRDSClient getClient() {
-		AmazonRDSClient rdsClient = null;
+	private AmazonRDSAsyncClient getClient() {
+		AmazonRDSAsyncClient rdsClient = null;
 		try {
 			AWSCredentials credentials = new PropertiesCredentials(new File(
 					CREDENTIAL_PATH));
-			rdsClient = new AmazonRDSClient(credentials);
+			rdsClient = new AmazonRDSAsyncClient(credentials);
 			rdsClient.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 

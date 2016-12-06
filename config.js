@@ -18,6 +18,6 @@
 	}],
 
 	// Email configs
-	"mailSender": "aram.bekverdyan@gmail.com",
+	"mailSender": "sergey.hlghatyan@scdm.de",
 	"credentialsFilePath": "/client_secret_gmail-api.json"
 }

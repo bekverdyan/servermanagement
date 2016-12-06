@@ -33,18 +33,17 @@ import com.amazonaws.services.rds.model.Tag;
 public class RDSUtils {
   public static void main(String[] args) {
     try {
-      AWSCredentials credentials = new PropertiesCredentials(new File("/home/aram/Documents/aws/credentials"));
+      AWSCredentials credentials = new PropertiesCredentials(new File("/home/sergeyhlghatyan/ssh_keys/aws/credentials"));
       AmazonRDSAsync rdsAsync = new AmazonRDSAsyncClient(credentials);
       AmazonRDS rds = new AmazonRDSClient(credentials);
       rdsAsync.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 
       Set<String> inst = new HashSet<String>();
-      inst.add("nabs-qa1");
-      inst.add("nabs-qa2");
+      inst.add("NABS-QA-41");
       // inst.add("nabs-qa3");
       // inst.add("nabs-qa5");
 
-      List<DBInstance> futures = restoreDBFromSnapshot(rdsAsync, inst, "nabs-qa-17-may-2016");
+      List<DBInstance> futures = restoreDBFromSnapshot(rdsAsync, inst, "nabs-qa");
 
       // deleteDBInstances(rds, inst);
       // rebootDBInstances(rdsAsync, inst);

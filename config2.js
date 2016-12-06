@@ -8,6 +8,9 @@
         "snapshot"
 :
     "nabs-qa",
+        // Email configs
+        "mailSender": "sergey.hlghatyan@scdm.de",
+        "credentialsFilePath": "/client_secret_gmail-api.json",
         "ec2"
 :
     [{

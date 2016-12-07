@@ -32,8 +32,7 @@ import com.google.api.services.gmail.model.ModifyMessageRequest;
 public class EmailUtils {
   private static final String user = "me";
 
-  public static void listLabels() throws IOException {
-    Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
+  public static void listLabels(Gmail service) throws IOException {
     ListLabelsResponse response = service.users().labels().list(user).execute();
     List<Label> labels = response.getLabels();
     for (Label label : labels) {
@@ -41,10 +40,11 @@ public class EmailUtils {
     }
   }
 
-  public void sentEmail(String to, String subject, String bodyText) throws MessagingException, IOException {
+  public void sentEmail(Gmail service, String to, String subject, String bodyText) throws MessagingException,
+      IOException {
     MimeMessage emailContent = createEmail(to, subject, bodyText);
 
-    sendMessage(emailContent);
+    sendMessage(service, emailContent);
   }
 
   private MimeMessage createEmail(String to, String subject, String bodyText) throws MessagingException {
@@ -61,9 +61,7 @@ public class EmailUtils {
     return email;
   }
 
-  private Message sendMessage(MimeMessage emailContent) throws MessagingException,
-      IOException {
-    Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
+  private Message sendMessage(Gmail service, MimeMessage emailContent) throws MessagingException, IOException {
     Message message = createMessageWithEmail(emailContent);
 
     message = service.users().messages().send(user, message).execute();
@@ -82,14 +80,13 @@ public class EmailUtils {
   }
 
   private Message markaAsReadAndArchieveTheEmail(Gmail service, String emailId) throws IOException {
-    ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(Arrays.asList("Label_2"))
-        .setRemoveLabelIds(Arrays.asList("UNREAD", "INBOX"));
+    ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(Arrays.asList("Label_2")).setRemoveLabelIds(
+        Arrays.asList("UNREAD", "INBOX"));
 
     return service.users().messages().modify(user, emailId, mods).execute();
   }
 
-  public JSONObject checkForEmail() throws IOException {
-    Gmail service = GmailServiceBuilder.INSTANCE.getGmailService();
+  public JSONObject checkForEmail(Gmail service) throws IOException {
     ConfigModel configModel = ConfigUtils.loadConfigJson();
 
     ListMessagesResponse messagesResponse = service.users().messages().list(user)

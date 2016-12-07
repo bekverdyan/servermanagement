@@ -26,7 +26,7 @@ public enum GmailServiceBuilder {
   INSTANCE;
 
   /** Application name. */
-  private static final String APPLICATION_NAME = "Gmail API";
+  private static final String APPLICATION_NAME = "Automatization";
 
   /** Global instance of the JSON factory. */
   private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -38,12 +38,12 @@ public enum GmailServiceBuilder {
   private static FileDataStoreFactory DATA_STORE_FACTORY;
 
   /** Directory to store user credentials for this application. */
-  private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
-      ".credentials/gmail-api");
+  private static final java.io.File DATA_STORE_DIR = new java.io.File(GmailServiceBuilder.class.getResource(
+      "/credentials/gmail-api").getFile());
 
   /**
    * Global instance of the scopes required If modifying these scopes, delete
-   * your previously saved credentials at ~/.credentials/gmail-api
+   * your previously saved credentials at /credentials/gmail-api from resources directory
    */
   private static final List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
 
@@ -72,7 +72,7 @@ public enum GmailServiceBuilder {
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
         clientSecrets, SCOPES).setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline").build();
     Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-    System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
+    //System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
     return credential;
   }
 

@@ -1,7 +1,10 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 public class ConfigModel {
 
@@ -45,6 +48,18 @@ public class ConfigModel {
   public String gitPassword;
   public List<EC2> ec2;
   public String mailSender;
+  public List<String> senderEmails;
+
+  public List<String> getValidatedEmails() {
+    List<String> validEmails = new ArrayList<>();
+    
+    for (String email : senderEmails) {
+      if (EmailValidator.getInstance().isValid(email))
+        validEmails.add(email);
+    }
+
+    return validEmails;
+  }
 
   @Override
   public String toString() {

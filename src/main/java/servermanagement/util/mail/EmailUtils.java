@@ -114,7 +114,7 @@ public class EmailUtils {
         }
       }
 
-      //markaAsReadAndArchieveTheEmail(service, messageId);
+      markaAsReadAndArchieveTheEmail(service, messageId);
     }
 
     return jsonObject;

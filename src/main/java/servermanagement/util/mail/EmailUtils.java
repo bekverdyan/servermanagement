@@ -90,7 +90,8 @@ public class EmailUtils {
     ConfigModel configModel = ConfigUtils.loadConfigJson();
 
     ListMessagesResponse messagesResponse = service.users().messages().list(user)
-        .setQ("is:unread in:inbox from:" + configModel.mailSender).execute();
+        .setQ(buildMailFilterCriteria(Arrays.asList(configModel.mailSender))).execute();
+
     List<Message> messages = messagesResponse.getMessages();
     List<String> messageIds = messages.stream().map(Message::getId).collect(Collectors.toList());
     Message msg;
@@ -113,10 +114,30 @@ public class EmailUtils {
         }
       }
 
-      markaAsReadAndArchieveTheEmail(service, messageId);
+      //markaAsReadAndArchieveTheEmail(service, messageId);
     }
 
     return jsonObject;
+  }
+
+  private String buildMailFilterCriteria(List<String> emails) {
+    StringBuilder builder = new StringBuilder();
+    final String filter = "is:unread in:inbox";
+    final String from = " from:";
+
+    builder.append(filter);
+
+    if (emails != null && !emails.isEmpty()) {
+      builder.append(" {");
+
+      for (String email : emails) {
+        builder.append(from).append(email);
+      }
+
+      builder.append("}");
+    }
+
+    return builder.toString();
   }
 
   @SuppressWarnings("unchecked")

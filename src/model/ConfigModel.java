@@ -16,4 +16,12 @@ public class ConfigModel {
     public String toString() {
         return "ConfigModel [ec2=" + ec2 + "]";
     }
+
+    public EC2 getByName(String name) {
+        return this.ec2.stream()
+                .filter(el -> el.name.equalsIgnoreCase(name))
+                .findFirst()
+                .get();
+
+    }
 }

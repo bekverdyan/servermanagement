@@ -21,118 +21,153 @@ import com.amazonaws.services.ec2.model.StopInstancesRequest;
 
 public class EC2Manager {
 
-	private final static Logger logger = Logger.getLogger(EC2Manager.class);
+    private final static Logger logger = Logger.getLogger(EC2Manager.class);
 
-	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
+   // private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
+   private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
 
-	public EC2Manager() {
-	}
+    public EC2Manager() {
+    }
 
-	public String startEc2Instance(EC2 ec2) throws Exception {
-		AmazonEC2AsyncClient client = getClient();
-		String ip = startServer(client, ec2);
-		client.shutdown();
-		return ip;
-	}
+    public String startEc2Instance(EC2 ec2) {
+        String ip = null;
+        AmazonEC2AsyncClient client = null;
+        try {
+            if(ec2 != null) {
+                client = getClient();
+                if (client != null) {
+                    ip = startServer(client, ec2);
+                    if (ip == null) {
+                        logger.debug(String.format("start server for %s has failed", ec2.getLogTag()));
+                    }
+                } else {
+                    logger.debug(String.format("get AmazonEC2AsyncClient for  %s has failed", ec2.getLogTag()));
+                }
+            }else{
+                logger.debug("Ec2 instance is null");
+            }
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
+        }
 
-	private AmazonEC2AsyncClient getClient() {
-		AWSCredentials credentials;
-		AmazonEC2AsyncClient client = null;
-		try {
-			credentials = new PropertiesCredentials(new File(CREDENTIAL_PATH));
-			client = new AmazonEC2AsyncClient(credentials);
-			client.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
-		} catch (IllegalArgumentException | IOException e) {
-			logger.error(e);
-		}
+        return ip;
+    }
 
-		return client;
-	}
+    private AmazonEC2AsyncClient getClient() {
+        AWSCredentials credentials;
+        AmazonEC2AsyncClient client = null;
+        try {
+            File file = new File(CREDENTIAL_PATH);
+            credentials = new PropertiesCredentials(file);
+            client = new AmazonEC2AsyncClient(credentials);
+            client.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
-	private String startServer(AmazonEC2Async client, EC2 ec2) throws Exception {
-		String ip = null;
-		try {
+        return client;
+    }
 
-			StartInstancesRequest startRequest = new StartInstancesRequest()
-					.withInstanceIds(ec2.id);
+    private String startServer(AmazonEC2Async client, EC2 ec2) {
+        String ip = null;
+        try {
 
-			@SuppressWarnings("unused")
-			StartInstancesResult startResult = client
-					.startInstances(startRequest);
+            DescribeInstancesResult describeInstanceResult;
 
-			DescribeInstancesResult describeInstanceResult = null;
-			
-			describeInstanceResult = getInstanceStatus(ec2.id, client);
+            StartInstancesRequest startRequest = new StartInstancesRequest()
+                    .withInstanceIds(ec2.id);
 
-			Integer instanceState = describeInstanceResult.getReservations().get(0)
-					.getInstances().get(0).getState().getCode();
-			
-			while (instanceState != 16) { // Loop until the instance is in the
-											// "running" state.
-				describeInstanceResult = getInstanceStatus(ec2.id, client);
+            @SuppressWarnings("unused")
+            StartInstancesResult startResult = client
+                    .startInstances(startRequest);
 
-				instanceState = describeInstanceResult.getReservations().get(0)
-						.getInstances().get(0).getState().getCode();
+            Integer instanceState = -1;
 
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					logger.error(e);
-				}
-			}
+            do {
+                describeInstanceResult = getInstanceStatus(ec2.id, client);
 
-			logger.debug(ec2.name + " started");
+                instanceState = describeInstanceResult.getReservations()
+                        .get(0)
+                        .getInstances()
+                        .get(0)
+                        .getState()
+                        .getCode();
 
-			ip = describeInstanceResult
-					.getReservations()
-					.get(0)
-					.getInstances()
-					.stream()
-					.filter(instance -> instance.getTags().stream()
-							.filter(tag -> tag.getKey().equals("Name"))
-							.findFirst().get().getValue().equals(ec2.name))
-					.findFirst().get().getPublicIpAddress();
+                if (instanceState != 16) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
+                }
+            } while (instanceState != 16);// Loop until the instance is in the
 
-		} catch (Exception e) {
-			logger.error(e);
-			throw e;
-		}
+            logger.debug(ec2.name + " started");
 
-		return ip;
-	}
+            ip = describeInstanceResult
+                    .getReservations()
+                    .get(0)
+                    .getInstances()
+                    .get(0)
+                    .getPublicIpAddress();
 
-	// 0 : pending
-	// 16 : running
-	// 32 : shutting-down
-	// 48 : terminated
-	// 64 : stopping
-	// 80 : stopped
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
-	public DescribeInstancesResult getInstanceStatus(String instanceId,
-			AmazonEC2Async ec2) {
-		DescribeInstancesRequest describeInstanceRequest = new DescribeInstancesRequest()
-				.withInstanceIds(instanceId);
-		DescribeInstancesResult describeInstanceResult = ec2
-				.describeInstances(describeInstanceRequest);
-		//
-		// InstanceState state = describeInstanceResult.getReservations().get(0)
-		// .getInstances().get(0).getState();
-		//
-		//
-		// String ip = describeInstanceResult.getReservations().get(0)
-		// .getInstances().get(0).getPublicIpAddress();
+        return ip;
+    }
 
-		return describeInstanceResult;
-	}
+    // 0 : pending
+    // 16 : running
+    // 32 : shutting-down
+    // 48 : terminated
+    // 64 : stopping
+    // 80 : stopped
 
-	public void stopEc2Instance(EC2 ec2) {
-		AmazonEC2AsyncClient client = getClient();
-		stopServer(client, ec2);
-	}
+    public DescribeInstancesResult getInstanceStatus(String instanceId,
+                                                     AmazonEC2Async ec2) {
+        DescribeInstancesRequest describeInstanceRequest = new DescribeInstancesRequest()
+                .withInstanceIds(instanceId);
+        return ec2
+                .describeInstances(describeInstanceRequest);
+    }
 
-	private void stopServer(AmazonEC2Async client, EC2 ec2) {
-		StopInstancesRequest stopRequest = new StopInstancesRequest()
-				.withInstanceIds(ec2.id);
-		client.stopInstances(stopRequest);
-	}
+    public boolean stopEc2Instance(EC2 ec2) {
+
+        boolean bret = true;
+        AmazonEC2AsyncClient client = null;
+        try {
+            client = getClient();
+            if (client != null) {
+                bret = stopServer(client, ec2);
+                if (!bret) {
+                    logger.debug(String.format("stop server for %s has failed", ec2.getLogTag()));
+                }
+            } else {
+                logger.debug(String.format("get AmazonEC2AsyncClient for  %s has failed", ec2.getLogTag()));
+            }
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
+        }
+
+        return bret;
+    }
+
+    private boolean stopServer(AmazonEC2Async client, EC2 ec2) {
+        boolean bret = true;
+        try {
+            StopInstancesRequest stopRequest = new StopInstancesRequest()
+                    .withInstanceIds(ec2.id);
+            client.stopInstances(stopRequest);
+        } catch (Exception ex) {
+            bret = false;
+            logger.error(ex);
+        }
+        return bret;
+    }
 }

@@ -13,6 +13,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,9 +38,15 @@ public enum GmailServiceBuilder {
   /** Global instance of the {@link FileDataStoreFactory}. */
   private static FileDataStoreFactory DATA_STORE_FACTORY;
 
+  private static final String CREDENTIAL_PATH = "src/main/resources/credentials/gmail-api";
+
+  //private static final java.io.File CREDENTIAL_PATH = new File("src/main/resources/credentials/gmail-api");
+
   /** Directory to store user credentials for this application. */
-  private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
-      ".credentials/gmail-api");
+//  private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
+//      ".credentials/gmail-api");
+
+  private static final java.io.File DATA_STORE_DIR = new File(CREDENTIAL_PATH);
 
   /**
    * Global instance of the scopes required If modifying these scopes, delete
@@ -65,7 +72,7 @@ public enum GmailServiceBuilder {
    */
   public Credential authorize() throws IOException {
     // Load client secrets.
-    InputStream in = GmailServiceBuilder.class.getResourceAsStream("/client_secret_gmail-api.json");
+    InputStream in = GmailServiceBuilder.class.getResourceAsStream(DATA_STORE_DIR.getAbsolutePath() + "/client_secret_gmail-api.json");
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
     // Build flow and trigger user authorization request.

@@ -162,7 +162,7 @@ public class EmailUtils {
 
         Base64 base64url = new Base64(true);
         byte[] fileByteArray = base64url.decodeBase64(attachPart.getData());
-        FileOutputStream fileOutFile = new FileOutputStream("/home/aram/Pictures/" + filename);
+        FileOutputStream fileOutFile = new FileOutputStream("~/Pictures/" + filename);
         fileOutFile.write(fileByteArray);
         fileOutFile.close();
       }

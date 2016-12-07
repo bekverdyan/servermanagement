@@ -24,108 +24,138 @@ import com.amazonaws.services.rds.model.RestoreDBInstanceFromDBSnapshotRequest;
 
 public class RDSManager {
 
-	private final static Logger logger = Logger.getLogger(RDSManager.class);
+    private final static Logger logger = Logger.getLogger(RDSManager.class);
 
-	private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
+    private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
 
-	public RDSManager() {
-	}
+    public RDSManager() {
+    }
 
-	public String startRDSInstance(EC2 ec2, String snapshot) throws Exception {
-		String endpoint = null;
-		AmazonRDSClient rdsClient = getClient();
-		endpoint = restoreDBFromSnapshot(rdsClient, ec2, snapshot);
-		rdsClient.shutdown();
+    public String startRDSInstance(EC2 ec2, String snapshot) {
+        String endpoint = null;
+        AmazonRDSClient rdsClient = null;
+        try {
+            rdsClient = getClient();
+            if (rdsClient != null) {
+                endpoint = restoreDBFromSnapshot(rdsClient, ec2, snapshot);
+                if (endpoint == null) {
+                    logger.debug(String.format("start rds for %s has failed", ec2.getLogTag()));
+                }
+            } else {
+                logger.debug(String.format("get AmazonRDSClient for  %s has failed", ec2.getLogTag()));
+            }
+        } finally {
+            if (rdsClient != null) {
+                rdsClient.shutdown();
+            }
+        }
+        return endpoint;
+    }
 
-		return endpoint;
-	}
+    private AmazonRDSAsyncClient getClient() {
+        AmazonRDSAsyncClient rdsClient = null;
+        try {
+            AWSCredentials credentials = new PropertiesCredentials(new File(
+                    CREDENTIAL_PATH));
+            rdsClient = new AmazonRDSAsyncClient(credentials);
+            rdsClient.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return rdsClient;
+    }
 
-	private AmazonRDSAsyncClient getClient() {
-		AmazonRDSAsyncClient rdsClient = null;
-		try {
-			AWSCredentials credentials = new PropertiesCredentials(new File(
-					CREDENTIAL_PATH));
-			rdsClient = new AmazonRDSAsyncClient(credentials);
-			rdsClient.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e){
-			e.printStackTrace();
-		}
+    public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
+                                        String snapshotIdentifier) {
 
-		return rdsClient;
-	}
+        String endpoint = null;
+        try {
 
-	public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
-			String snapshotIdentifier) throws Exception {
+            DescribeDBInstancesRequest dbInstanceDescribeRequest = new DescribeDBInstancesRequest()
+                    .withDBInstanceIdentifier(ec2.rds);
 
-		String endpoint = null;
-		try {
+            DescribeDBInstancesResult describeDBInstancesResult = rds
+                    .describeDBInstances(dbInstanceDescribeRequest);
 
-			DescribeDBInstancesRequest dbInstancesRequest = new DescribeDBInstancesRequest()
-					.withDBInstanceIdentifier(ec2.rds);
+            String instanceState = describeDBInstancesResult.getDBInstances()
+                    .get(0)
+                    .getDBInstanceStatus();
 
-			DescribeDBInstancesResult describeDBInstancesResult = rds
-					.describeDBInstances(dbInstancesRequest);
-			String instanceState = describeDBInstancesResult.getDBInstances()
-					.get(0).getDBInstanceStatus();
+            if (!instanceState.equals("available")) {
 
-			endpoint = describeDBInstancesResult.getDBInstances().get(0)
-					.getEndpoint().getAddress();
+                RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
+                        ec2.rds, snapshotIdentifier)
+                        .withDBInstanceClass("db.r3.xlarge");
 
-			if (!instanceState.equals("available")) {
-				try {
+                rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
 
-					RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
-							ec2.rds, snapshotIdentifier)
-							.withDBInstanceClass("db.r3.xlarge");
-					rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
 
-				} catch (com.amazonaws.services.rds.model.DBInstanceAlreadyExistsException ex) {
-					logger.warn(ex);
-				}
+                do {
+                    describeDBInstancesResult = rds
+                            .describeDBInstances(dbInstanceDescribeRequest);
 
-				while (!instanceState.equals("available")) {
-					describeDBInstancesResult = rds
-							.describeDBInstances(dbInstancesRequest);
+                    instanceState = describeDBInstancesResult.getDBInstances()
+                            .get(0)
+                            .getDBInstanceStatus();
 
-					instanceState = describeDBInstancesResult.getDBInstances()
-							.get(0).getDBInstanceStatus();
 
-					endpoint = describeDBInstancesResult.getDBInstances()
-							.get(0).getEndpoint().getAddress();
+                    if (!instanceState.equals("available")) {
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            logger.error(e);
+                        }
 
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						logger.error(e);
-					}
-				}
-			}
-		} catch (Exception e2) {
-			logger.error(e2);
-			throw e2;
-		}
+                        endpoint = describeDBInstancesResult.getDBInstances()
+                                .get(0)
+                                .getEndpoint()
+                                .getAddress();
+                    }
+                }
+                while (!instanceState.equals("available"));
 
-		return endpoint;
-	}
+            }
+        } catch (Exception e2) {
+            logger.error(e2);
+        }
 
-	public void stopRDSInstance(EC2 ec2) {
-		AmazonRDSClient rdsClient = getClient();
-		deleteDBInstances(rdsClient, ec2);
-		rdsClient.shutdown();
-	}
+        return endpoint;
+    }
 
-	private void deleteDBInstances(AmazonRDSClient rds, EC2 ec2) {
-		List<DBInstance> dBInstances = new ArrayList<DBInstance>();
-		DeleteDBInstanceRequest deleteRequest = null;
+    public boolean stopRDSInstance(EC2 ec2) {
 
-		deleteRequest = new DeleteDBInstanceRequest(ec2.rds)
-				.withSkipFinalSnapshot(true);
-		dBInstances.add(rds.deleteDBInstance(deleteRequest));
-	}
+
+        boolean bret = true;
+        AmazonRDSClient client = null;
+        try {
+            client = getClient();
+            if (client != null) {
+                bret = deleteDBInstances(client, ec2);
+                if (!bret) {
+                    logger.debug(String.format("delete Rds for %s has failed", ec2.getLogTag()));
+                }
+            } else {
+                logger.debug(String.format("get AmazonRDSClient for  %s has failed", ec2.getLogTag()));
+            }
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
+        }
+
+        return bret;
+    }
+
+    private boolean deleteDBInstances(AmazonRDSClient rds, EC2 ec2) {
+        boolean bret = true;
+        try {
+            DeleteDBInstanceRequest deleteRequest = new DeleteDBInstanceRequest(ec2.rds)
+                    .withSkipFinalSnapshot(true);
+            rds.deleteDBInstance(deleteRequest);
+        } catch (Exception ex) {
+            bret = false;
+            logger.error(ex);
+        }
+        return bret;
+    }
 }

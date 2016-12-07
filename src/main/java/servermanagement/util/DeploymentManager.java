@@ -1,18 +1,13 @@
 package main.java.servermanagement.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
 
 import main.java.servermanagement.util.mail.EmailUtils;
 import model.ConfigModel;
 import model.EC2;
 import model.EmailCommand;
-import model.KeyValuePair;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -21,9 +16,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 
 public class DeploymentManager {
 
@@ -32,6 +25,8 @@ public class DeploymentManager {
             .getLogger(DeploymentManager.class);
 
     public static void main(String[] args) {
+
+        EmailUtils emailUtils = new EmailUtils();
 
 
         //String inputFilePath = readArguments(args);
@@ -48,7 +43,7 @@ public class DeploymentManager {
         logger.info(configModel);
 
 
-        EmailUtils emailUtils = new EmailUtils();
+      //  EmailUtils emailUtils = new EmailUtils();
 
         try {
             while (true) {
@@ -136,7 +131,7 @@ public class DeploymentManager {
                                         } else {
                                             message = ec2.name + " failed to start";
                                         }
-                                        emailUtils.sentEmail(configModel.mailSender, subject, message);
+                                 //       emailUtils.sendEmail("", subject, message);
                                     }
 
                                 } catch (Exception e) {
@@ -189,7 +184,7 @@ public class DeploymentManager {
                         message = message + ec2.name + " fails to stop";
                     }
 
-                    emailUtils.sentEmail(configModel.mailSender, subject, message);
+                 //   emailUtils.sendEmail("", subject, message);
                 }
             } catch (Exception e) {
                 logger.error(e);

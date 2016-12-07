@@ -24,73 +24,82 @@ import java.util.List;
  * Created by aram on 12/5/16.
  */
 public enum GmailServiceBuilder {
-  INSTANCE;
+    INSTANCE;
 
-  /** Application name. */
-  private static final String APPLICATION_NAME = "Gmail API";
+    /**
+     * Application name.
+     */
+    private static final String APPLICATION_NAME = "Automatization";
 
-  /** Global instance of the JSON factory. */
-  private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    /**
+     * Global instance of the JSON factory.
+     */
+    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-  /** Global instance of the HTTP transport. */
-  private static HttpTransport HTTP_TRANSPORT;
+    /**
+     * Global instance of the HTTP transport.
+     */
+    private static HttpTransport HTTP_TRANSPORT;
 
-  /** Global instance of the {@link FileDataStoreFactory}. */
-  private static FileDataStoreFactory DATA_STORE_FACTORY;
+    /**
+     * Global instance of the {@link FileDataStoreFactory}.
+     */
+    private static FileDataStoreFactory DATA_STORE_FACTORY;
 
-  private static final String CREDENTIAL_PATH = "src/main/resources/credentials/gmail-api";
+    /**
+     * Directory to store user credentials for this application.
+     */
+    private static final java.io.File DATA_STORE_DIR = new java.io.File(GmailServiceBuilder.class.getResource(
+            "/credentials/gmail-api")
+            .getFile());
 
-  //private static final java.io.File CREDENTIAL_PATH = new File("src/main/resources/credentials/gmail-api");
+    /**
+     * Global instance of the scopes required If modifying these scopes, delete
+     * your previously saved credentials at /credentials/gmail-api from resources directory
+     */
+    private static final List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
 
-  /** Directory to store user credentials for this application. */
-//  private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
-//      ".credentials/gmail-api");
-
-  private static final java.io.File DATA_STORE_DIR = new File(CREDENTIAL_PATH);
-
-  /**
-   * Global instance of the scopes required If modifying these scopes, delete
-   * your previously saved credentials at ~/.credentials/gmail-api
-   */
-  private static final List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
-
-  static {
-    try {
-      HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-      DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      System.exit(1);
+    static {
+        try {
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(1);
+        }
     }
-  }
 
-  /**
-   * Creates an authorized Credential object.
-   * 
-   * @return an authorized Credential object.
-   * @throws IOException
-   */
-  public Credential authorize() throws IOException {
-    // Load client secrets.
-    InputStream in = GmailServiceBuilder.class.getResourceAsStream(DATA_STORE_DIR.getAbsolutePath() + "/client_secret_gmail-api.json");
-    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+    /**
+     * Creates an authorized Credential object.
+     *
+     * @return an authorized Credential object.
+     * @throws IOException
+     */
+    public Credential authorize() throws IOException {
+        // Load client secrets.
 
-    // Build flow and trigger user authorization request.
-    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-        clientSecrets, SCOPES).setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline").build();
-    Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-    System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
-    return credential;
-  }
+        InputStream in = GmailServiceBuilder.class.getResourceAsStream("/credentials/client_secret_gmail-api.json");
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-  /**
-   * Build and return an authorized Gmail client service.
-   * 
-   * @return an authorized Gmail client service
-   * @throws IOException
-   */
-  public Gmail getGmailService() throws IOException {
-    Credential credential = authorize();
-    return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
-  }
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                clientSecrets, SCOPES).setDataStoreFactory(DATA_STORE_FACTORY)
+                .setAccessType("offline")
+                .build();
+        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        //System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
+        return credential;
+    }
+
+    /**
+     * Build and return an authorized Gmail client service.
+     *
+     * @return an authorized Gmail client service
+     * @throws IOException
+     */
+    public Gmail getGmailService() throws IOException {
+        Credential credential = authorize();
+        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
+                .build();
+    }
 }

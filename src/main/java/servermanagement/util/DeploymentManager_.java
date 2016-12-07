@@ -135,7 +135,7 @@ public class DeploymentManager_ {
                             shellExecuter.close();
                         }
 
-                        emailUtils.sentEmail(configModel.mailSender, "server start", "servers are succesfully started");
+                        emailUtils.sendEmail(configModel.mailSender, "server start", "servers are succesfully started");
 
                     } catch (Exception e) {
                         logger.error(e);
@@ -163,7 +163,7 @@ public class DeploymentManager_ {
                 rdsManager.stopRDSInstance(ec2);
                 ec2Manager.stopEc2Instance(ec2);
 
-                emailUtils.sentEmail(configModel.mailSender, "server stop", "servers are succesfully stoped");
+                emailUtils.sendEmail(configModel.mailSender, "server stop", "servers are succesfully stoped");
             } catch (Exception e) {
                 logger.error(e);
             }

@@ -1,6 +1,9 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 public class ConfigModel {
 
@@ -9,8 +12,20 @@ public class ConfigModel {
     public List<EC2> ec2;
 
     public String snapshot;
-    public String mailSender;
     public String credentialsFilePath;
+    public List<String> senderEmails;
+
+    public List<String> getValidatedEmails() {
+        List<String> validEmails = new ArrayList<>();
+
+        for (String email : senderEmails) {
+            if (EmailValidator.getInstance()
+                    .isValid(email))
+                validEmails.add(email);
+        }
+
+        return validEmails;
+    }
 
     @Override
     public String toString() {

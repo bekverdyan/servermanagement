@@ -22,14 +22,14 @@ public class Deployer implements Closeable {
 
     private final String EXPORT_JAVA_6 = "export JAVA_HOME=/usr/lib/jvm/java-6-oracle/jre";
 
-    private static final String DEPLOY = CODE_DIR_PATH + "nabs/NABS/deploy.sh";
+    private static final String DEPLOY = "deploy.sh";
 
     private static String USERNAME = "ubuntu"; // username for remote host
 
     private static int port = 22;
     private static final String privateKey = "src/main/resources/credentials/NABS.pem";
 
-    private Map<String, Session> sessionMap = new ConcurrentHashMap<String, Session>();
+    //private Map<String, Session> sessionMap = new ConcurrentHashMap<String, Session>();
 
     static class Command {
         public String command;
@@ -111,7 +111,7 @@ public class Deployer implements Closeable {
     private boolean executeDeployNabs(Session session, EC2 ec2) throws Exception {
         return this.executeCommand(
                 session,
-                Command.from(EXPORT_JAVA_6 + "; " + "sh " + DEPLOY, ec2.name));
+                Command.from(EXPORT_JAVA_6 + ";cd " + CODE_DIR_PATH + "nabs/NABS/;" + "sh " + DEPLOY, ec2.name));
     }
 
     private boolean startAndDeployOnGrid(Session session, EC2 ec2) {
@@ -122,28 +122,28 @@ public class Deployer implements Closeable {
 
     private Session openConnection(EC2 ec2) {
         Session session = null;
-        if (sessionMap.containsKey(ec2.name)) {
-            session = sessionMap.get(ec2.name);
-        } else {
-            try {
-                /**
-                 * Create a new Jsch object This object will execute shell
-                 * commands or scripts on server
-                 */
-                JSch jsch = new JSch();
+//        if (sessionMap.containsKey(ec2.name)) {
+//            session = sessionMap.get(ec2.name);
+//        } else {
+        try {
+            /**
+             * Create a new Jsch object This object will execute shell
+             * commands or scripts on server
+             */
+            JSch jsch = new JSch();
 
-                jsch.addIdentity(privateKey);
-                logger.info("identity added for " + ec2.getLogTag());
+            jsch.addIdentity(privateKey);
+            logger.info("identity added for " + ec2.getLogTag());
 
-                session = jsch.getSession(USERNAME, ec2.ip, port);
-                session.setConfig("StrictHostKeyChecking", "no");
-                session.connect();
-                sessionMap.put(ec2.name, session);
+            session = jsch.getSession(USERNAME, ec2.ip, port);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+            //   sessionMap.put(ec2.name, session);
 
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
+        // }
 
         return session;
     }
@@ -177,6 +177,8 @@ public class Deployer implements Closeable {
 
             int exitStatus = channelExec.getExitStatus();
 
+            in.close();
+            reader.close();
             channelExec.disconnect();
 
             if (exitStatus < 0) {
@@ -198,12 +200,12 @@ public class Deployer implements Closeable {
 
     @Override
     public void close() throws IOException {
-        try {
-            this.sessionMap.values()
-                    .forEach(session -> session.disconnect());
-            this.sessionMap.clear();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+//        try {
+//            this.sessionMap.values()
+//                    .forEach(session -> session.disconnect());
+//            this.sessionMap.clear();
+//        } catch (Exception e) {
+//            logger.error(e.getMessage(), e);
+//        }
     }
 }

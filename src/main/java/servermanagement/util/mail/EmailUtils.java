@@ -11,12 +11,13 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import main.java.servermanagement.util.ConfigUtils;
+
+import main.java.servermanagement.util.DeploymentManager;
 import model.ConfigModel;
 
 import model.EmailCommand;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
+
 
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.google.api.services.gmail.Gmail;
@@ -27,8 +28,14 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
+import org.apache.commons.lang3.exception.ExceptionContext;
+import org.apache.log4j.Logger;
 
 public class EmailUtils {
+
+    private final static Logger logger = Logger
+            .getLogger(EmailUtils.class);
+
     private Gmail service = null;
     private static final String user = "me";
 
@@ -39,7 +46,8 @@ public class EmailUtils {
                 .execute();
         List<Label> labels = response.getLabels();
         for (Label label : labels) {
-            System.out.println(label.toPrettyString());
+//            /System.out.println(label.toPrettyString());
+            logger.info(label.toPrettyString());
         }
     }
 
@@ -51,12 +59,25 @@ public class EmailUtils {
         }
     }
 
-    public void sendEmail(Gmail service, String to, String subject, String bodyText) throws MessagingException,
+    public void sendEmail(String to, String subject, String bodyText) throws MessagingException,
             IOException {
         MimeMessage emailContent = createEmail(to, subject, bodyText);
 
         sendMessage(service, emailContent);
     }
+
+    public void sendEmail(List<String> to, String subject, String bodyText) throws MessagingException,
+            IOException {
+        to.forEach(el -> {
+            try {
+                sendEmail(el, subject, bodyText);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        });
+
+    }
+
 
     private MimeMessage createEmail(String to, String subject, String bodyText) throws MessagingException {
         Properties props = new Properties();
@@ -112,34 +133,35 @@ public class EmailUtils {
                 .execute();
 
         List<Message> messages = messagesResponse.getMessages();
-        List<String> messageIds = messages.stream()
-                .map(Message::getId)
-                .collect(Collectors.toList());
-        Message msg;
+        if (messages != null) {
+            List<String> messageIds = messages.stream()
+                    .map(Message::getId)
+                    .collect(Collectors.toList());
+            Message msg;
 
-        for (String messageId : messageIds) {
-            msg = service.users()
-                    .messages()
-                    .get(user, messageId)
-                    .setFormat("raw")
-                    .execute();
-            String messageContentRaw = msg.getSnippet();
+            for (String messageId : messageIds) {
+                msg = service.users()
+                        .messages()
+                        .get(user, messageId)
+                        .setFormat("raw")
+                        .execute();
+                String messageContentRaw = msg.getSnippet();
 
-            List<String> messageContent = Arrays.asList(messageContentRaw.split(","));
+                List<String> messageContent = Arrays.asList(messageContentRaw.split(","));
 
-            for (String rawObject : messageContent) {
-                try {
-                    rawObject = StringUtils.removeStart(rawObject, " ");
-                    rawObject = StringUtils.removeEnd(rawObject, " ");
-                    commands.add(EmailCommand.createFromRawValue(rawObject));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                for (String rawObject : messageContent) {
+                    try {
+                        rawObject = StringUtils.removeStart(rawObject, " ");
+                        rawObject = StringUtils.removeEnd(rawObject, " ");
+                        commands.add(EmailCommand.createFromRawValue(rawObject));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                markaAsReadAndArchieveTheEmail(service, messageId);
             }
-
-            markaAsReadAndArchieveTheEmail(service, messageId);
         }
-
         return commands;
     }
 
@@ -164,11 +186,11 @@ public class EmailUtils {
         return builder.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    private void parseAndPutIntoJson(JSONObject jsonObject, String raw) throws Exception {
-        String[] splitted = raw.split("\\s+");
-        jsonObject.put(splitted[0], splitted[1]);
-    }
+//    @SuppressWarnings("unchecked")
+//    private void parseAndPutIntoJson(JSONObject jsonObject, String raw) throws Exception {
+//        String[] splitted = raw.split("\\s+");
+//        jsonObject.put(splitted[0], splitted[1]);
+//    }
 
     @SuppressWarnings("static-access")
     public void getAttachments(Gmail service, String userId, String messageId) throws IOException {

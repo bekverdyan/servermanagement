@@ -64,7 +64,7 @@ public class EC2Manager {
             client = new AmazonEC2AsyncClient(credentials);
             client.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.getMessage(),e);
         }
 
         return client;
@@ -99,7 +99,7 @@ public class EC2Manager {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
-                        logger.error(e);
+                        logger.error(ec2.getLogTag(),e);
                     }
                 }
             } while (instanceState != 16);// Loop until the instance is in the
@@ -114,7 +114,7 @@ public class EC2Manager {
                     .getPublicIpAddress();
 
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(ec2.getLogTag(),e);
         }
 
         return ip;
@@ -164,9 +164,9 @@ public class EC2Manager {
             StopInstancesRequest stopRequest = new StopInstancesRequest()
                     .withInstanceIds(ec2.id);
             client.stopInstances(stopRequest);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             bret = false;
-            logger.error(ex);
+            logger.error(ec2.getLogTag(),e);
         }
         return bret;
     }

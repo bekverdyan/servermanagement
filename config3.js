@@ -3,7 +3,7 @@
     "gitPassword": "",
     "snapshot": "nabs-qa",
     // Email configs
-    "mailSender": "sergey.hlghatyan@scdm.de",
+    "senderEmails": [ "sergey.hlghatyan@scdm.de","aram.bekverdyan@scdm.de"],
     "credentialsFilePath": "/client_secret_gmail-api.json",
     "ec2": [{
     "id": "i-d2e7de6e",

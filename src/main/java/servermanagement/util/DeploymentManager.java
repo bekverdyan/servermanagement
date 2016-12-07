@@ -1,5 +1,6 @@
 package main.java.servermanagement.util;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -18,6 +19,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
+import javax.mail.MessagingException;
+
 public class DeploymentManager {
 
     private static final String CONFIG_FILE_NAME = "config3.js";
@@ -26,14 +29,32 @@ public class DeploymentManager {
 
     public static void main(String[] args) {
 
-        EmailUtils emailUtils = new EmailUtils();
 
+//        String inputFilePath = CONFIG_FILE_NAME;
+//
+//        ConfigModel configModel = ConfigUtils
+//                .loadConfigJson(inputFilePath);
+//
+//        EmailUtils emailUtils = new EmailUtils();
 
+//        try {
+//            emailUtils.sendEmail(configModel.getValidatedEmails(),"ds","ddssdd");
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        // start(emailUtils,configModel,"NABS-QA-41");
+//        stop(emailUtils, configModel, "NABS-QA-41");
+
+//
         //String inputFilePath = readArguments(args);
         String inputFilePath = CONFIG_FILE_NAME;
 
         ConfigModel configModel = ConfigUtils
                 .loadConfigJson(inputFilePath);
+
+        EmailUtils emailUtils = new EmailUtils();
 
         if (configModel == null) {
             logger.error("invalid config file path " + inputFilePath);
@@ -43,7 +64,7 @@ public class DeploymentManager {
         logger.info(configModel);
 
 
-      //  EmailUtils emailUtils = new EmailUtils();
+        //  EmailUtils emailUtils = new EmailUtils();
 
         try {
             while (true) {
@@ -54,7 +75,7 @@ public class DeploymentManager {
                     commands.forEach(el -> {
                         if (el.command.equalsIgnoreCase("start")) {
                             start(emailUtils, configModel, el.ec2Name);
-                        } else {
+                        } else if (el.command.equalsIgnoreCase("stop")){
                             stop(emailUtils, configModel, el.ec2Name);
                         }
                     });
@@ -62,11 +83,11 @@ public class DeploymentManager {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
-                    logger.error(e);
+                    logger.error(e.getMessage(), e);
                 }
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -131,21 +152,20 @@ public class DeploymentManager {
                                         } else {
                                             message = ec2.name + " failed to start";
                                         }
-                                 //       emailUtils.sendEmail("", subject, message);
+                                        emailUtils.sendEmail(configModel.getValidatedEmails(), subject, message);
                                     }
 
                                 } catch (Exception e) {
-                                    logger.error(e);
-                                } finally {
-                                    if (deployer != null) {
-                                        deployer.close();
-                                    }
+                                    logger.error(e.getMessage(), e);
                                 }
                             }
+                        } else {
+                            logger.debug(ec2.getLogTag() + " Endpoint is null");
                         }
                     } catch (Exception e) {
-                        logger.error(e);
+                        logger.error(e.getMessage(), e);
                     }
+
                 })
                 .start();
     }
@@ -184,13 +204,12 @@ public class DeploymentManager {
                         message = message + ec2.name + " fails to stop";
                     }
 
-                 //   emailUtils.sendEmail("", subject, message);
+                    emailUtils.sendEmail(configModel.getValidatedEmails(), subject, message);
                 }
             } catch (Exception e) {
-                logger.error(e);
+                logger.error(e.getMessage(), e);
             }
         })
                 .start();
-
     }
 }

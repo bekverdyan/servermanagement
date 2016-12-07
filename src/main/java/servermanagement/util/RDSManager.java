@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.amazonaws.services.rds.AmazonRDSAsyncClient;
+import com.amazonaws.services.rds.model.*;
 import model.EC2;
 
 import org.apache.log4j.Logger;
@@ -16,11 +17,6 @@ import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.rds.AmazonRDSClient;
-import com.amazonaws.services.rds.model.DBInstance;
-import com.amazonaws.services.rds.model.DeleteDBInstanceRequest;
-import com.amazonaws.services.rds.model.DescribeDBInstancesRequest;
-import com.amazonaws.services.rds.model.DescribeDBInstancesResult;
-import com.amazonaws.services.rds.model.RestoreDBInstanceFromDBSnapshotRequest;
 
 public class RDSManager {
 
@@ -60,7 +56,7 @@ public class RDSManager {
             rdsClient = new AmazonRDSAsyncClient(credentials);
             rdsClient.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.getMessage(), e);
         }
         return rdsClient;
     }
@@ -74,21 +70,28 @@ public class RDSManager {
             DescribeDBInstancesRequest dbInstanceDescribeRequest = new DescribeDBInstancesRequest()
                     .withDBInstanceIdentifier(ec2.rds);
 
-            DescribeDBInstancesResult describeDBInstancesResult = rds
-                    .describeDBInstances(dbInstanceDescribeRequest);
+            DescribeDBInstancesResult describeDBInstancesResult =null;
+            String instanceState = "not started";
+            try {
+                describeDBInstancesResult = rds
+                        .describeDBInstances(dbInstanceDescribeRequest);
 
-            String instanceState = describeDBInstancesResult.getDBInstances()
-                    .get(0)
-                    .getDBInstanceStatus();
+                instanceState = describeDBInstancesResult.getDBInstances()
+                        .get(0)
+                        .getDBInstanceStatus();
+            } catch (DBInstanceNotFoundException e) {
+                logger.error(ec2.getLogTag(), e);
+            }
 
-            if (!instanceState.equals("available")) {
 
-                RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
-                        ec2.rds, snapshotIdentifier)
-                        .withDBInstanceClass("db.r3.xlarge");
+            if (!"available".equalsIgnoreCase(instanceState)) {
 
-                rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
-
+                if (instanceState.equals("not started")) {
+                    RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
+                            ec2.rds, snapshotIdentifier)
+                            .withDBInstanceClass("db.r3.xlarge");
+                    rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
+                }
 
                 do {
                     describeDBInstancesResult = rds
@@ -105,18 +108,20 @@ public class RDSManager {
                         } catch (InterruptedException e) {
                             logger.error(e);
                         }
-
-                        endpoint = describeDBInstancesResult.getDBInstances()
-                                .get(0)
-                                .getEndpoint()
-                                .getAddress();
                     }
                 }
                 while (!instanceState.equals("available"));
-
             }
+
+            if (describeDBInstancesResult != null) {
+                endpoint = describeDBInstancesResult.getDBInstances()
+                        .get(0)
+                        .getEndpoint()
+                        .getAddress();
+            }
+
         } catch (Exception e2) {
-            logger.error(e2);
+            logger.error(ec2.getLogTag(), e2);
         }
 
         return endpoint;
@@ -154,7 +159,7 @@ public class RDSManager {
             rds.deleteDBInstance(deleteRequest);
         } catch (Exception ex) {
             bret = false;
-            logger.error(ex);
+            logger.error(ec2.getLogTag(), ex);
         }
         return bret;
     }

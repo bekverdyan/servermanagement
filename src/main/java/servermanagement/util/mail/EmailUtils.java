@@ -114,7 +114,7 @@ public class EmailUtils {
     }
 
     private Message markaAsReadAndArchieveTheEmail(Gmail service, String emailId) throws IOException {
-        ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(Collections.singletonList("Label_2"))
+        ModifyMessageRequest mods = new ModifyMessageRequest().setAddLabelIds(Collections.singletonList("Label_1"))
                 .setRemoveLabelIds(
                         Arrays.asList("UNREAD", "INBOX"));
 

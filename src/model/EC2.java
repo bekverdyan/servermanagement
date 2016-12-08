@@ -9,6 +9,7 @@ public class EC2 {
     public String rds;
     public String ip;
     public String threadName;
+    public String snapshot;
     public Map<String, String> branches;
     public List<ReplaceConfig> replaceFiles;
 

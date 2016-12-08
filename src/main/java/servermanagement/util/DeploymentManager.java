@@ -29,42 +29,21 @@ public class DeploymentManager {
 
     public static void main(String[] args) {
 
+        String inputFilePath = readArguments(args);
 
-//        String inputFilePath = CONFIG_FILE_NAME;
-//
-//        ConfigModel configModel = ConfigUtils
-//                .loadConfigJson(inputFilePath);
-//
-//        EmailUtils emailUtils = new EmailUtils();
-
-//        try {
-//            emailUtils.sendEmail(configModel.getValidatedEmails(),"ds","ddssdd");
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        // start(emailUtils,configModel,"NABS-QA-41");
-//        stop(emailUtils, configModel, "NABS-QA-41");
-
-//
-        //String inputFilePath = readArguments(args);
-        String inputFilePath = CONFIG_FILE_NAME;
+        String configFilePath = inputFilePath != null ? inputFilePath : CONFIG_FILE_NAME;
 
         ConfigModel configModel = ConfigUtils
-                .loadConfigJson(inputFilePath);
-
-        EmailUtils emailUtils = new EmailUtils();
+                .loadConfigJson(configFilePath);
 
         if (configModel == null) {
-            logger.error("invalid config file path " + inputFilePath);
+            logger.error("invalid config file path " + configFilePath);
             System.exit(1);
         }
 
         logger.info(configModel);
 
-
-        //  EmailUtils emailUtils = new EmailUtils();
+        EmailUtils emailUtils = new EmailUtils();
 
         try {
             while (true) {
@@ -75,7 +54,7 @@ public class DeploymentManager {
                     commands.forEach(el -> {
                         if (el.command.equalsIgnoreCase("start")) {
                             start(emailUtils, configModel, el.ec2Name);
-                        } else if (el.command.equalsIgnoreCase("stop")){
+                        } else if (el.command.equalsIgnoreCase("stop")) {
                             stop(emailUtils, configModel, el.ec2Name);
                         }
                     });
@@ -95,8 +74,13 @@ public class DeploymentManager {
         Options options = new Options();
 
         Option input = new Option("c", "input", true, "input file path");
-        input.setRequired(true);
+        // input.setRequired(true);
         options.addOption(input);
+
+        Option input1 = new Option("t", "test", false, "test run");
+        // input.setRequired(true);
+        options.addOption(input1);
+
 
         CommandLineParser parser = new GnuParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -112,8 +96,10 @@ public class DeploymentManager {
             return null;
         }
 
-        return cmd.getOptionValue("c");
+
+        return cmd.hasOption("t") ? null : cmd.getOptionValue("c");
     }
+
 
     public static void start(EmailUtils emailUtils, ConfigModel configModel, String ec2Name) {
 
@@ -130,8 +116,7 @@ public class DeploymentManager {
                     try {
 
                         String endpoint = rdsManager
-                                .startRDSInstance(ec2,
-                                        configModel.snapshot);
+                                .startRDSInstance(ec2);
                         if (endpoint != null) {
                             String ip = ec2Manager.startEc2Instance(ec2);
 

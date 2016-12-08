@@ -27,18 +27,18 @@ public class RDSManager {
     public RDSManager() {
     }
 
-    public String startRDSInstance(EC2 ec2, String snapshot) {
+    public String startRDSInstance(EC2 ec2) {
         String endpoint = null;
         AmazonRDSClient rdsClient = null;
         try {
             rdsClient = getClient();
             if (rdsClient != null) {
-                endpoint = restoreDBFromSnapshot(rdsClient, ec2, snapshot);
+                endpoint = restoreDBFromSnapshot(rdsClient, ec2);
                 if (endpoint == null) {
-                    logger.debug(String.format("start rds for %s has failed", ec2.getLogTag()));
+                    logger.debug(String.format("start rds has failed for %s", ec2.getLogTag()));
                 }
             } else {
-                logger.debug(String.format("get AmazonRDSClient for  %s has failed", ec2.getLogTag()));
+                logger.debug(String.format("get AmazonRDSClient has failed for %s", ec2.getLogTag()));
             }
         } finally {
             if (rdsClient != null) {
@@ -61,8 +61,7 @@ public class RDSManager {
         return rdsClient;
     }
 
-    public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2,
-                                        String snapshotIdentifier) {
+    public String restoreDBFromSnapshot(AmazonRDSClient rds, EC2 ec2) {
 
         String endpoint = null;
         try {
@@ -70,7 +69,7 @@ public class RDSManager {
             DescribeDBInstancesRequest dbInstanceDescribeRequest = new DescribeDBInstancesRequest()
                     .withDBInstanceIdentifier(ec2.rds);
 
-            DescribeDBInstancesResult describeDBInstancesResult =null;
+            DescribeDBInstancesResult describeDBInstancesResult = null;
             String instanceState = "not started";
             try {
                 describeDBInstancesResult = rds
@@ -88,7 +87,7 @@ public class RDSManager {
 
                 if (instanceState.equals("not started")) {
                     RestoreDBInstanceFromDBSnapshotRequest restoreRequest = new RestoreDBInstanceFromDBSnapshotRequest(
-                            ec2.rds, snapshotIdentifier)
+                            ec2.rds, ec2.snapshot)
                             .withDBInstanceClass("db.r3.xlarge");
                     rds.restoreDBInstanceFromDBSnapshot(restoreRequest);
                 }

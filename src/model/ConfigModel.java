@@ -11,7 +11,7 @@ public class ConfigModel {
     public String gitPassword;
     public List<EC2> ec2;
 
-    public String snapshot;
+
     public String credentialsFilePath;
     public List<String> senderEmails;
 

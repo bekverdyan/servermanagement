@@ -78,7 +78,7 @@ public enum GmailServiceBuilder {
     public Credential authorize() throws IOException {
         // Load client secrets.
 
-        InputStream in = GmailServiceBuilder.class.getResourceAsStream("/credentials/client_secret_gmail-api.json");
+        InputStream in = GmailServiceBuilder.class.getResourceAsStream("/credentials/dev_ops_client_secret_gmail_api.json");
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.

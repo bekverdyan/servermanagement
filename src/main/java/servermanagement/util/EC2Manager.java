@@ -23,8 +23,8 @@ public class EC2Manager {
 
     private final static Logger logger = Logger.getLogger(EC2Manager.class);
 
-   // private static final String CREDENTIAL_PATH = "/home/sergeyhlghatyan/ssh_keys/aws/credentials";
-   private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
+    private static final String CREDENTIAL_PATH = (System.getProperty("user.home") + "/.credentials/aws/credentials.txt");
+    //private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
 
     public EC2Manager() {
     }
@@ -33,7 +33,7 @@ public class EC2Manager {
         String ip = null;
         AmazonEC2AsyncClient client = null;
         try {
-            if(ec2 != null) {
+            if (ec2 != null) {
                 client = getClient();
                 if (client != null) {
                     ip = startServer(client, ec2);
@@ -43,7 +43,7 @@ public class EC2Manager {
                 } else {
                     logger.debug(String.format("get AmazonEC2AsyncClient for  %s has failed", ec2.getLogTag()));
                 }
-            }else{
+            } else {
                 logger.debug("Ec2 instance is null");
             }
         } finally {
@@ -64,7 +64,7 @@ public class EC2Manager {
             client = new AmazonEC2AsyncClient(credentials);
             client.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 
         return client;
@@ -99,7 +99,7 @@ public class EC2Manager {
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e) {
-                        logger.error(ec2.getLogTag(),e);
+                        logger.error(ec2.getLogTag(), e);
                     }
                 }
             } while (instanceState != 16);// Loop until the instance is in the
@@ -114,7 +114,7 @@ public class EC2Manager {
                     .getPublicIpAddress();
 
         } catch (Exception e) {
-            logger.error(ec2.getLogTag(),e);
+            logger.error(ec2.getLogTag(), e);
         }
 
         return ip;
@@ -166,7 +166,7 @@ public class EC2Manager {
             client.stopInstances(stopRequest);
         } catch (Exception e) {
             bret = false;
-            logger.error(ec2.getLogTag(),e);
+            logger.error(ec2.getLogTag(), e);
         }
         return bret;
     }

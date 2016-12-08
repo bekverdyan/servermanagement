@@ -27,7 +27,7 @@ public class Deployer implements Closeable {
     private static String USERNAME = "ubuntu"; // username for remote host
 
     private static int port = 22;
-    private static final String privateKey = "src/main/resources/credentials/NABS.pem";
+    private static final String privateKey =  (System.getProperty("user.home") + "/.credentials/nabs/NABS.pem");
 
     //private Map<String, Session> sessionMap = new ConcurrentHashMap<String, Session>();
 

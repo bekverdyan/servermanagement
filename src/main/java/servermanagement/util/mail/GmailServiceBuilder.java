@@ -49,9 +49,12 @@ public enum GmailServiceBuilder {
     /**
      * Directory to store user credentials for this application.
      */
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(GmailServiceBuilder.class.getResource(
-            "/credentials/gmail-api")
-            .getFile());
+//    private static final java.io.File DATA_STORE_DIR = new java.io.File(GmailServiceBuilder.class.getResource(
+//            "/credentials/gmail-api")
+//            .getFile());
+
+    private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
+            ".credentials/gmail-api");
 
     /**
      * Global instance of the scopes required If modifying these scopes, delete

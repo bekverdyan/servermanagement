@@ -22,7 +22,8 @@ public class RDSManager {
 
     private final static Logger logger = Logger.getLogger(RDSManager.class);
 
-    private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
+    //private static final String CREDENTIAL_PATH = "src/main/resources/credentials/credentials.txt";
+    private static final String CREDENTIAL_PATH = (System.getProperty("user.home") + "/.credentials/aws/credentials.txt");
 
     public RDSManager() {
     }

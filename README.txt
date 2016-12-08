@@ -1,0 +1,1 @@
+copy .credentials folder to user home directory

@@ -11,20 +11,19 @@ import com.google.gson.GsonBuilder;
 
 public class ConfigUtils {
 
+  public static ConfigModel loadConfigJson(String path) {
+    ConfigModel config = null;
 
-	public static ConfigModel loadConfigJson(String path) {
-		ConfigModel config = null;
+    try {
+      String content = new String(Files.readAllBytes(Paths.get(path)));
 
-		try {
-			String content = new String(Files.readAllBytes(Paths.get(path)));
+      GsonBuilder builder = new GsonBuilder();
+      Gson gson = builder.create();
+      config = gson.fromJson(content, ConfigModel.class);
 
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
-			config = gson.fromJson(content, ConfigModel.class);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return config;
-	}
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return config;
+  }
 }

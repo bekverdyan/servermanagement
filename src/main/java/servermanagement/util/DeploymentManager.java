@@ -49,6 +49,8 @@ public class DeploymentManager {
         try {
           commands = emailUtils.checkForEmail(configModel);
         } catch (IOException e) {
+          logger.error("Gmail service need to be restarting. Trying to restart");
+          //logger.error(e.getMessage(),e);
           emailUtils.restartService();
         }
 

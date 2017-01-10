@@ -58,7 +58,9 @@ public class EmailUtils {
   public void restartService() {
     try {
       service = GmailServiceBuilder.INSTANCE.restart();
+      logger.info("Gmail service is successfully restarted");
     } catch (IOException e) {
+      logger.error("Gmail service failed to restarted");
       logger.error(e.getMessage(), e);
     }
   }

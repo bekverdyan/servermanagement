@@ -1,6 +1,7 @@
 package main.java.servermanagement.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -43,7 +44,7 @@ public class DeploymentManager {
 
     try {
       while (true) {
-        List<EmailCommand> commands = null;
+        List<EmailCommand> commands = new ArrayList<>();
 
         try {
           commands = emailUtils.checkForEmail(configModel);
@@ -61,6 +62,8 @@ public class DeploymentManager {
               stop(emailUtils, configModel, el.ec2Name);
             }
           });
+        }else{
+          logger.error("commands are empty");
         }
         try {
           Thread.sleep(5000);

@@ -64,8 +64,6 @@ public class DeploymentManager {
               stop(emailUtils, configModel, el.ec2Name);
             }
           });
-        }else{
-          logger.error("commands are empty");
         }
         try {
           Thread.sleep(5000);

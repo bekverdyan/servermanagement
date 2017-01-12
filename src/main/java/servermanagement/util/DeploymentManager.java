@@ -41,10 +41,10 @@ public class DeploymentManager {
     logger.info(configModel);
 
     EmailUtils emailUtils = new EmailUtils();
+    List<EmailCommand> commands = new ArrayList<>();
 
     try {
       while (true) {
-        List<EmailCommand> commands = new ArrayList<>();
 
         try {
           commands = emailUtils.checkForEmail(configModel);
